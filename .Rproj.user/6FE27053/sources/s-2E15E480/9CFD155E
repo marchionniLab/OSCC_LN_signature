@@ -1,0 +1,24 @@
+{
+    "id": "9CFD155E",
+    "path": "/Volumes/Macintosh/Research/Projects/HNSCC/Code/04prepareDataSmallBatchCorr.R",
+    "project_path": "Code/04prepareDataSmallBatchCorr.R",
+    "type": "r_source",
+    "hash": "740426586",
+    "contents": "",
+    "dirty": false,
+    "created": 1606240387120.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "cursorPosition": "225,52",
+        "scrollLine": "178"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1606241397,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1606241397904,
+    "read_only": false,
+    "read_only_alternatives": []
+}

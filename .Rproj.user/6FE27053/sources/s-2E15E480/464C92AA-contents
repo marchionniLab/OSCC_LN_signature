@@ -1,0 +1,60 @@
+
+### Clean
+rm(list=ls())
+
+### Setwd
+setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
+
+
+## Load the Phenotype data of both Array and TCGA data
+load("objs/Pheno.rda")
+
+ArrayPheno <- trainPheno
+tcgaPheno <- testPheno
+
+rm(trainPheno, testPheno)
+
+### Combine together
+tcgaPheno$patientID <- NULL
+tcgaPheno$smokingDetails <- NULL
+ArrayDataset <- ArrayPheno$dataset
+ArrayPheno$dataset <- NULL
+ArrayPheno$dataset <- ArrayDataset
+tcgaPheno$dataset <- rep("TCGA", nrow(tcgaPheno))
+
+all(colnames(tcgaPheno) == colnames(ArrayPheno))
+
+AllPheno <- rbind(ArrayPheno, tcgaPheno)
+
+
+########
+## Get the characteristics
+NofSamples <- nrow(AllPheno) # 189 samples
+
+MeanAge <- mean(AllPheno$age[!is.na(AllPheno$age)]) # 60.5 years
+sdAge <- sd(AllPheno$age[!is.na(AllPheno$age)])
+
+
+Gender <- table(AllPheno$gender)
+Gender # F:62, M: 127
+
+
+HPV_status <- summary(is.na(AllPheno$HPV))
+HPV_status # 48: Negative -- 141 NAs
+
+T_Stage <- table(AllPheno$Tstage)
+T_Stage # T1: 34 - T2: 155
+
+N_Stage <- table(AllPheno$NstagePath)
+N_Stage # N0:130 - N1: 27 - N2: 32
+
+Smoking <- table(AllPheno$smoking)
+Smoking # Yes: 130 - No: 54 - NAs : 5
+
+meanPackYear <- mean(!is.na(AllPheno$packyears))
+meanPackYear
+
+
+
+
+
