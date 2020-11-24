@@ -1,0 +1,228 @@
+#################################################################
+### Solit TCGA head and neck data for LN statu kTSP prediction and validation
+### Luigi Marchionni
+### Collaboration with Yasmen Ghantous (Sidransky lab)
+
+
+#################################################################
+### Clean
+rm(list=ls())
+
+### Setwd
+setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
+
+### Libraries
+require(sampling)
+require(Biobase)
+require(limma)
+library(sva)
+
+
+################################################################
+################################################################
+### Load expression data and phenotypes from Farhoud dataset
+
+### Base path
+bPath1 <- "./Data/fromFarhoud/"
+
+### Load Farhoud data
+load(paste(bPath1,  "2016.12.28_AllData_clin_matched_pre_correction_n1135.RData",  sep=""))
+
+### Rename
+dat1 <- combinednew
+rm(combinednew)
+
+### Load clinical info
+pheno1 <- read.csv(paste(bPath1,  "2017.02.08_Combined_clin_dat_v13.csv",  sep=""),
+		 stringsAsFactors=FALSE)
+
+### Check conformity and reorder if needed
+all(colnames(dat1) == pheno1$sample_id)
+all(colnames(dat1) %in% pheno1$sample_id)
+dat1 <- dat1[ ,  pheno1$sample_id]
+all(colnames(dat1) == pheno1$sample_id)
+
+
+################################################################
+################################################################
+### Load expression data and phenotypes from Hollinger's dataset: GSE42743
+
+### Load GSE42743
+load("./Objs/GSE42743FromLuigi/esetGSE42743.rda")
+
+### Expression
+dat2 <- exprs(esetgse)
+rownames(dat2) <- fData(esetgse)$SYMBOL
+
+### Pheno data
+pheno2 <- pData(esetgse)
+
+
+#################################################################
+### Combine
+pheno <- data.frame(sampleID=c(pheno1$sample_id,  pheno2$Row.names),
+		  stringsAsFactors=FALSE)
+
+### Add patient ID
+pheno$patientID <- c(pheno1$pt_id,  pheno2$title)
+
+### Add Age
+pheno$age <- c(pheno1$age,  pheno2$age.dx)
+
+### Add gender
+pheno$gender <- factor(c(pheno1$sex,  as.character(pheno2$gender)))
+levels(pheno$gender) <- c("F", "F",  "M", "M")
+
+### Add site
+pheno$site <- factor(c(pheno1$site,  pheno2$oc.vs..op))
+levels(pheno$site)
+
+### Add HPV
+pheno$HPV <- factor(c(pheno1$hpv_status,  rep(NA,  nrow(pheno2))))
+levels(pheno$HPV)
+
+### Add T stage
+pheno$Tstage <- factor(c(paste("T", pheno1$t_stage, sep=""),
+		       as.character( pheno2$t.stage)))
+levels(pheno$Tstage) <- gsub("[ab]$",  "",  levels(pheno$Tstage))
+levels(pheno$Tstage)[levels(pheno$Tstage) %in% c("TNA",  "TX")] <- NA
+levels(pheno$Tstage)
+
+### Add clincal n_stage
+pheno$NstageClin <- factor(c(rep(NA, nrow(pheno1)),
+			   as.character( pheno2$cn.stage)))
+levels(pheno$NstageClin)
+
+### Add path n_stage
+pheno$NstagePath <- factor(toupper(c(paste("N", pheno1$n_stage, sep=""), 
+			   as.character( pheno2$pn.stage))))
+levels(pheno$NstagePath)
+levels(pheno$NstagePath)[levels(pheno$NstagePath) %in% c("NNA",  "NX")] <- NA
+levels(pheno$NstagePath) <- gsub("[ABC]$",  "",  levels(pheno$NstagePath))
+levels(pheno$NstagePath)
+
+### Add smoking
+pheno$smoking <- factor(c(pheno1$tobacco, pheno2$smoking.status))
+levels(pheno$smoking)[levels(pheno$smoking) %in% c("1",  "CURRENT",  "FORMER")] <- "YES"
+levels(pheno$smoking)[levels(pheno$smoking) %in% c("0",  "NEVERSMOKER")] <- "NO"
+levels(pheno$smoking)[levels(pheno$smoking) %in% c("888")] <- NA
+
+### Add smoking details
+pheno$smokingDetails <- factor(c(pheno1$tobacco, pheno2$smoking.status))
+levels(pheno$smokingDetails)
+
+### Add pack years
+pheno$packyears <- c(as.numeric(pheno1$packyears), rep(NA,  nrow(pheno2)))
+summary(pheno$packyears)
+
+### Add OS time
+pheno$OStime <- c(pheno1$os_mo, round(pheno2$futime/30,1))
+summary(pheno$OStime)
+
+### Add OS event
+pheno$OSevent <- factor(c(pheno1$os_event, pheno2$survivallastfollowup))
+levels(pheno$OSevent) <- gsub("^DEA.+",  "Yes",  levels(pheno$OSevent))
+levels(pheno$OSevent) <- gsub("^DIED.+",  "Yes",  levels(pheno$OSevent))
+levels(pheno$OSevent) <- gsub("^LIVING.+",  "No",  levels(pheno$OSevent))
+levels(pheno$OSevent)
+
+### Add dataset
+pheno$dataset <- factor(c(pheno1$source,  rep("GSE42743", nrow(pheno2))))
+levels(pheno$dataset)
+
+### Add rownames
+rownames(pheno) <- pheno$sampleID
+
+
+#################################################################
+### Select common genes
+gns <- intersect(rownames(dat1),  rownames(dat2))
+str(gns)
+
+### Combine expression
+dat <- cbind(dat1[gns,] ,  dat2[gns, ])
+
+### Check conformity
+all(colnames(dat) == rownames(pheno))
+
+### turn to matrix
+dat <- data.matrix(dat)
+
+
+#################################################################
+### Scale and log transforms if necessary
+maxDat <- apply(dat, 2,  max)
+minDat <- apply(dat, 2,  min)
+tapply(maxDat, pheno$dataset, mean)
+tapply(minDat, pheno$dataset, mean)
+
+### ### Need to add 2 to TCGA: better shift everything (rather than bringing up TCGA)
+### dat[ , pheno$dataset == "TCGA"] <- 1+dat[ , pheno$dataset == "TCGA"]
+
+### Floor all datasets
+dat <- 2+dat
+
+### Need to rescale this: GSE40774
+dat[ , pheno$dataset == "GSE40774"] <- log2(dat[ , pheno$dataset == "GSE40774"])
+
+
+#################################################################
+#### Remove duplicated samples in  TCGA
+dropTCGA <- grep("^TCGA.+06$", colnames(dat), value=TRUE)
+str(dropTCGA)
+dat <- dat[ ,  !colnames(dat) %in% dropTCGA]
+pheno <- pheno[ !rownames(pheno) %in% dropTCGA, ]
+
+
+#### Remove duplicated samples in Chung's and TCGA
+### Collapsing functions
+source("./Code/collapseFunc.R")
+
+### Identify data to be collapsed
+dupPt <- pheno$patientID[duplicated(pheno$patientID)]
+dupSmp <- pheno$sampleID[ pheno$patientID %in% dupPt]
+dupPt <- pheno[ pheno$patientID %in% dupPt, "patientID"]
+
+### Tmp exprs
+tmp <- dat[, colnames(dat) %in% dupSmp]
+dim(tmp)
+
+### Collapse expression by median
+tmp <- t(apply(tmp, 1, collapseData,  ind=dupPt, func=median))
+colnames(tmp) <- collapseData(dupSmp, dupPt, func=function(z) z[[1]] )
+
+### Remove from dat
+dim(dat)
+dat <- dat[ , !colnames(dat) %in% dupSmp ]
+
+### Add median sample and subset pheno
+dat <- cbind(tmp, dat)
+pheno <- pheno[ colnames(dat), ]
+
+### Check conformity
+any(duplicated(pheno$patientID))
+all(rownames(pheno) == colnames(dat))
+
+
+#################################################################
+### ### Remove batch: run pSVA
+### pSVA.dat <- psva(dat,  batch=pheno$dataset)
+### colnames(pSVA.dat) <- colnames(dat)
+
+### Remove batch: run Combat
+combat.dat <- ComBat(dat, batch=pheno$dataset)
+
+
+#################################################################
+### Save
+save(dat,  pheno,   combat.dat,  file="./objs/combinedData.rda")
+
+
+
+#################################################################
+### Session Info
+date()
+sessionInfo()
+
+### Quit
+q("no")
