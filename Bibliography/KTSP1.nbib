@@ -1,0 +1,87 @@
+PMID- 16105897
+OWN - NLM
+STAT- MEDLINE
+DCOM- 20051207
+LR  - 20191210
+IS  - 1367-4803 (Print)
+IS  - 1367-4811 (Electronic)
+IS  - 1367-4803 (Linking)
+VI  - 21
+IP  - 20
+DP  - 2005 Oct 15
+TI  - Simple decision rules for classifying human cancers from gene expression profiles.
+PG  - 3896-904
+AB  - MOTIVATION: Various studies have shown that cancer tissue samples can be 
+      successfully detected and classified by their gene expression patterns using machine 
+      learning approaches. One of the challenges in applying these techniques for 
+      classifying gene expression data is to extract accurate, readily interpretable rules 
+      providing biological insight as to how classification is performed. Current methods 
+      generate classifiers that are accurate but difficult to interpret. This is the 
+      trade-off between credibility and comprehensibility of the classifiers. Here, we 
+      introduce a new classifier in order to address these problems. It is referred to as 
+      k-TSP (k-Top Scoring Pairs) and is based on the concept of 'relative expression 
+      reversals'. This method generates simple and accurate decision rules that only 
+      involve a small number of gene-to-gene expression comparisons, thereby facilitating 
+      follow-up studies. RESULTS: In this study, we have compared our approach to other 
+      machine learning techniques for class prediction in 19 binary and multi-class gene 
+      expression datasets involving human cancers. The k-TSP classifier performs as 
+      efficiently as Prediction Analysis of Microarray and support vector machine, and 
+      outperforms other learning methods (decision trees, k-nearest neighbour and naïve 
+      Bayes). Our approach is easy to interpret as the classifier involves only a small 
+      number of informative genes. For these reasons, we consider the k-TSP method to be a 
+      useful tool for cancer classification from microarray gene expression data. 
+      AVAILABILITY: The software and datasets are available at http://www.ccbm.jhu.edu 
+      CONTACT: actan@jhu.edu.
+FAU - Tan, Aik Choon
+AU  - Tan AC
+AD  - Center for Cardiovascular Bioinformatics and Modeling, Whitaker Biomedical 
+      Engineering Institute, Baltimore, MD 21218, USA. actan@jhu.edu
+FAU - Naiman, Daniel Q
+AU  - Naiman DQ
+FAU - Xu, Lei
+AU  - Xu L
+FAU - Winslow, Raimond L
+AU  - Winslow RL
+FAU - Geman, Donald
+AU  - Geman D
+LA  - eng
+GR  - R01 HL072488/HL/NHLBI NIH HHS/United States
+GR  - R01 HL072488-02/HL/NHLBI NIH HHS/United States
+GR  - R01-HL72488/HL/NHLBI NIH HHS/United States
+PT  - Evaluation Study
+PT  - Journal Article
+PT  - Research Support, N.I.H., Extramural
+PT  - Research Support, Non-U.S. Gov't
+PT  - Research Support, U.S. Gov't, P.H.S.
+DEP - 20050816
+TA  - Bioinformatics
+JT  - Bioinformatics (Oxford, England)
+JID - 9808944
+RN  - 0 (Biomarkers, Tumor)
+RN  - 0 (Neoplasm Proteins)
+SB  - IM
+MH  - Algorithms
+MH  - *Artificial Intelligence
+MH  - Biomarkers, Tumor/*metabolism
+MH  - Cluster Analysis
+MH  - Diagnosis, Computer-Assisted/*methods
+MH  - Gene Expression Profiling/*methods
+MH  - Humans
+MH  - Neoplasm Proteins/*metabolism
+MH  - Neoplasms/*diagnosis/*metabolism
+MH  - Pattern Recognition, Automated/*methods
+MH  - Reproducibility of Results
+MH  - Sensitivity and Specificity
+PMC - PMC1987374
+MID - NIHMS6287
+EDAT- 2005/08/18 09:00
+MHDA- 2005/12/13 09:00
+CRDT- 2005/08/18 09:00
+PHST- 2005/08/18 09:00 [pubmed]
+PHST- 2005/12/13 09:00 [medline]
+PHST- 2005/08/18 09:00 [entrez]
+AID - bti631 [pii]
+AID - 10.1093/bioinformatics/bti631 [doi]
+PST - ppublish
+SO  - Bioinformatics. 2005 Oct 15;21(20):3896-904. doi: 10.1093/bioinformatics/bti631. 
+      Epub 2005 Aug 16.

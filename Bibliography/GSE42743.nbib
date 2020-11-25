@@ -1,0 +1,120 @@
+PMID- 23319825
+OWN - NLM
+STAT- MEDLINE
+DCOM- 20131031
+LR  - 20181113
+IS  - 1078-0432 (Print)
+IS  - 1078-0432 (Linking)
+VI  - 19
+IP  - 5
+DP  - 2013 Mar 1
+TI  - A 13-gene signature prognostic of HPV-negative OSCC: discovery and external 
+      validation.
+PG  - 1197-203
+LID - 10.1158/1078-0432.CCR-12-2647 [doi]
+AB  - PURPOSE: To identify a prognostic gene signature for patients with human papilloma 
+      virus (HPV)-negative oral squamous cell carcinomas (OSCC). EXPERIMENTAL DESIGN: Two 
+      gene expression datasets were used: a training dataset from the Fred Hutchinson 
+      Cancer Research Center (FHCRC, Seattle, WA; n = 97) and a validation dataset from 
+      the MD Anderson Cancer Center (MDACC, Houston, TX; n = 71). We applied 
+      L1/L2-penalized Cox regression models to the FHCRC data on the 131-gene signature 
+      previously identified to be prognostic in patients with OSCCs to identify a 
+      prognostic model specific for patients with high-risk HPV-negative OSCCs. The models 
+      were tested with the MDACC dataset using a receiver operating characteristic (ROC) 
+      analysis. RESULTS: A 13-gene model was identified as the best predictor of 
+      HPV-negative OSCC-specific survival in the training dataset. The risk score for each 
+      patient in the validation dataset was calculated from this model and dichotomized at 
+      the median. The estimated 2-year mortality (± SE) of patients with high-risk scores 
+      was 47.1% (± 9.24%) compared with 6.35% (± 4.42) for patients with low-risk scores. 
+      ROC analyses showed that the areas under the curve for the age, gender, and 
+      treatment modality-adjusted models with risk score [0.78; 95% confidence interval 
+      (CI), 0.74-0.86] and risk score plus tumor stage (0.79; 95% CI, 0.75-0.87) were 
+      substantially higher than for the model with tumor stage (0.54; 95% CI, 0.48-0.62). 
+      CONCLUSIONS: We identified and validated a 13-gene signature that is considerably 
+      better than tumor stage in predicting survival of patients with HPV-negative OSCCs. 
+      Further evaluation of this gene signature as a prognostic marker in other 
+      populations of patients with HPV-negative OSCC is warranted.
+CI  - ©2012 AACR.
+FAU - Lohavanichbutr, Pawadee
+AU  - Lohavanichbutr P
+AD  - Program in Epidemiology, Clinical Research Division, Fred Hutchinson Cancer Research 
+      Center, Seattle, Washington 98109, USA.
+FAU - Méndez, Eduardo
+AU  - Méndez E
+FAU - Holsinger, F Christopher
+AU  - Holsinger FC
+FAU - Rue, Tessa C
+AU  - Rue TC
+FAU - Zhang, Yuzheng
+AU  - Zhang Y
+FAU - Houck, John
+AU  - Houck J
+FAU - Upton, Melissa P
+AU  - Upton MP
+FAU - Futran, Neal
+AU  - Futran N
+FAU - Schwartz, Stephen M
+AU  - Schwartz SM
+FAU - Wang, Pei
+AU  - Wang P
+FAU - Chen, Chu
+AU  - Chen C
+LA  - eng
+GR  - P50 CA097007/CA/NCI NIH HHS/United States
+GR  - P50CA97007/CA/NCI NIH HHS/United States
+GR  - L30 CA117652/CA/NCI NIH HHS/United States
+GR  - R01 GM082802/GM/NIGMS NIH HHS/United States
+GR  - K12 CA088084/CA/NCI NIH HHS/United States
+GR  - NIH NCI R01CA095419/CA/NCI NIH HHS/United States
+GR  - 2 L30CA117652-02A1/CA/NCI NIH HHS/United States
+GR  - KL2 RR025015/RR/NCRR NIH HHS/United States
+GR  - KL2 TR000421/TR/NCATS NIH HHS/United States
+GR  - R01 CA095419/CA/NCI NIH HHS/United States
+GR  - K12CA088084/CA/NCI NIH HHS/United States
+GR  - 1KL2RR025015-01/RR/NCRR NIH HHS/United States
+PT  - Comparative Study
+PT  - Journal Article
+PT  - Research Support, N.I.H., Extramural
+PT  - Research Support, Non-U.S. Gov't
+DEP - 20130114
+TA  - Clin Cancer Res
+JT  - Clinical cancer research : an official journal of the American Association for 
+      Cancer Research
+JID - 9502500
+RN  - 0 (Biomarkers, Tumor)
+SB  - IM
+MH  - Adult
+MH  - Aged
+MH  - Aged, 80 and over
+MH  - Biomarkers, Tumor/*genetics
+MH  - Carcinoma, Squamous Cell/*genetics/mortality/virology
+MH  - Case-Control Studies
+MH  - Female
+MH  - Follow-Up Studies
+MH  - *Gene Expression Profiling
+MH  - Humans
+MH  - Male
+MH  - Middle Aged
+MH  - Mouth Neoplasms/*genetics/mortality/virology
+MH  - Neoplasm Staging
+MH  - Oligonucleotide Array Sequence Analysis
+MH  - Papillomaviridae/*genetics
+MH  - Papillomavirus Infections/*genetics/mortality/virology
+MH  - Prognosis
+MH  - ROC Curve
+MH  - Risk Factors
+MH  - Survival Rate
+MH  - Young Adult
+PMC - PMC3593802
+MID - NIHMS436809
+EDAT- 2013/01/16 06:00
+MHDA- 2013/11/01 06:00
+CRDT- 2013/01/16 06:00
+PHST- 2013/01/16 06:00 [entrez]
+PHST- 2013/01/16 06:00 [pubmed]
+PHST- 2013/11/01 06:00 [medline]
+AID - 1078-0432.CCR-12-2647 [pii]
+AID - 10.1158/1078-0432.CCR-12-2647 [doi]
+PST - ppublish
+SO  - Clin Cancer Res. 2013 Mar 1;19(5):1197-203. doi: 10.1158/1078-0432.CCR-12-2647. Epub 
+      2013 Jan 14.

@@ -1,5 +1,30 @@
 
+
+library(switchBox)
+library(caret)
+
 ###########################################################################################
+load("./Objs/FinalClassifiers.rda")
+## Load the RT-PCR data
+pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
+
+# Get the node status
+pcrGroup <- pcrData$NodeStatus
+table(pcrGroup)
+# Rename the groups from 0,1 to neg,pos
+pcrGroup[pcrGroup == 0] <- "NEG"
+pcrGroup[pcrGroup == 1] <- "POS"
+
+# Get the matrix
+pcrMat <- pcrData[, -14]
+rownames(pcrMat) <- pcrMat$SampleName
+pcrMat$SampleName <- NULL
+
+# Transpose the matrix
+pcrMat <- t(pcrMat)
+
+# One gene is misspelled, rename it
+rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
 
 ### Compute the sum and find the best threshold: ALL TRAINING SAMPLES
 ktspStatsPCR <- SWAP.KTSP.Statistics(

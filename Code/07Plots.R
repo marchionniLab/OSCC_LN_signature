@@ -5,6 +5,8 @@ setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
 library(ggplot2)
 library(switchBox)
 library(superheat)
+library(reshape2)
+library(pROC)
 
 ## Load the 2 classifiers and data
 load("./Objs/FinalClassifiers.rda")
@@ -482,7 +484,7 @@ datArray_KTSP <- melt(data.frame(
   ## Mechanistic KTSP SUM training
   ktspStatsArray= ktspStatsArray$statistics))
 ### Change Colnames
-colnames(datArray_KTSP) <- c("Status", "KTSP_type", "KTSP_sum")
+colnames(datArray_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 
 
 ### Testing
@@ -492,7 +494,7 @@ datTcga_KTSP <- melt(data.frame(
   ## Mechanistic KTSP SUM training
   ktspStatsTCGA=ktspStatsTCGA$statistics))
 ### Change Colnames
-colnames(datTcga_KTSP) <- c("Status", "KTSP_type", "KTSP_sum")
+colnames(datTcga_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 
 ### Testing
 datPCR_KTSP <- melt(data.frame(
@@ -501,15 +503,15 @@ datPCR_KTSP <- melt(data.frame(
   ## Mechanistic KTSP SUM training
   ktspStatsPCR=ktspStatsPCR$statistics))
 ### Change Colnames
-colnames(datPCR_KTSP) <- c("Status", "KTSP_type", "KTSP_sum")
+colnames(datPCR_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 
 ### Combine
 dat_KTSP <- rbind(datArray_KTSP, datTcga_KTSP, datPCR_KTSP)
 dat_KTSP$Status <- as.numeric(dat_KTSP$Status)-1
 
 ### Replace levels
-levels(dat_KTSP$KTSP_type) <- gsub("Stats", "", levels(dat_KTSP$KTSP_type))
-levels(dat_KTSP$KTSP_type) <- paste(levels(dat_KTSP$KTSP_type), forLegend_KTSP)
+levels(dat_KTSP$Dataset) <- c("Training (Array)", "Training (TCGA)", "Testing (RT-PCR)")
+levels(dat_KTSP$Dataset) <- paste(levels(dat_KTSP$Dataset), forLegend_KTSP)
 
 #################################################################
 ### Plot Curve
@@ -519,12 +521,10 @@ png("./Figs/CompareAUCggplot.png",
 myCol <- brewer.pal(3, "Dark2")[c(2,1)]
 ### Plot and legend titles
 plotTitle <- "K-TSP Performance in the training and testing datasets"
-#legendTitle <- paste("Training (", "Array)",
-#                     " - Training (", "TCGA)",  
-#                     " - Testing (", "PCR)", sep="")
+#legendTitle <- "Dataset"
 ### Plot
-basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=KTSP_type,
-                                       linetype = KTSP_type)) +
+basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
+                                       linetype = Dataset)) +
   geom_roc(cutoffs.at = seq(1,20,1)) +
   style_roc(theme = theme_grey) + ggtitle(plotTitle) +
   theme(plot.title = element_text(face="bold", size=16, hjust = 0.5),
@@ -534,16 +534,16 @@ basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=KTSP_type,
         legend.background=element_rect(fill="lightblue1"),
         legend.text=element_text(face="plain", size = 10),
         legend.title = element_text(face="bold", size=12)) +
-  scale_color_manual(values = c("red", "red", "darkgreen")) +
+  scale_color_manual(values = c("darkred", "darkred", "darkblue")) +
   #scale_color_manual(legendTitle, values=rep(myCol, 2)) +
-  scale_linetype_manual(legendTitle, values=rep(c("solid", "dotted"), each=2)) +
+  scale_linetype_manual(values=c("solid", "solid", "solid")) +
   guides(colour = guide_legend(override.aes = list(size=3)))
 ### Plot
 basicplot_KTSP
 ### Close device
 dev.off()
 
-save(basicplot_KTSP, file = "./Objs/KTSP/BasicPlot_KTSP.rda")
+save(basicplot_KTSP, file = "./Objs/BasicPlot_KTSP.rda")
 
 
 ####################################################################################################

@@ -6,3 +6,4 @@ predResults.xlsx
 renv/
 renv.lock
 Text/
+.Rproj.user
