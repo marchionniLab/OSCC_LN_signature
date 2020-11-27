@@ -119,26 +119,33 @@ Nstage_TCGA
 
 #####################################3
 ## Load the RT-PCR data
-pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
+library("readxl")
+pcrPheno <- read_xlsx("./Data/RT_PCR/Table 1.xlsx")
 
-# Get the node status
-pcrGroup <- pcrData$NodeStatus
-table(pcrGroup)
-# Rename the groups from 0,1 to neg,pos
-pcrGroup[pcrGroup == 0] <- "NEG"
-pcrGroup[pcrGroup == 1] <- "POS"
+#####
+## Age
+PCR_MeanAge <- mean(pcrPheno$age) # 60.4 years
 
-# Get the matrix
-pcrMat <- pcrData[, -14]
-rownames(pcrMat) <- pcrMat$SampleName
-pcrMat$SampleName <- NULL
+#######
+## % males
+PercMalesPCR <- (table(pcrPheno$Gender)["M"]/nrow(pcrPheno)) *100
+PercMalesPCR # 74.3%
 
-# Transpose the matrix
-pcrMat <- t(pcrMat)
+#########
+## T-stage
+Tstage_PCR <- table(pcrPheno$`T staging`)
+Tstage_PCR
 
-# One gene is misspelled, rename it
-rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
+#########
+## N-stage
+Nstage_PCR <- table(pcrPheno$`N staging`)
+Nstage_PCR
 
+Nstage_GSE42743 <- table(GSE42743Pheno$NstagePath)
+Nstage_GSE42743
+
+Nstage_TCGA <- table(tcgaPheno$NstagePath)
+Nstage_TCGA
 
 
 
