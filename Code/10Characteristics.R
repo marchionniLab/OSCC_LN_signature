@@ -1,6 +1,6 @@
 
 ### Clean
-rm(list=ls())
+rm(list = ls())
 
 ### Setwd
 setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
