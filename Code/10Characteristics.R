@@ -146,7 +146,3 @@ Nstage_GSE42743
 
 Nstage_TCGA <- table(tcgaPheno$NstagePath)
 Nstage_TCGA
-
-
-
-ss
