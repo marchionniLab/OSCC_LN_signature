@@ -1,10 +1,12 @@
 
+rm(list = ls())
 
 library(switchBox)
 library(caret)
 
 ###########################################################################################
 load("./Objs/FinalClassifiers.rda")
+
 ## Load the RT-PCR data
 pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
 
@@ -49,4 +51,4 @@ pcrGroup <- factor(pcrGroup, levels = c("POS", "NEG"))
 table(pcrGroup)
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(pcrPrediction, pcrGroup, positive="NEG")
+confusionMatrix(pcrPrediction, pcrGroup, positive="POS")

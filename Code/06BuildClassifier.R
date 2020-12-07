@@ -10,7 +10,7 @@
 rm(list=ls())
 
 ### Setwd
-setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
+#setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
 
 
 ### Load library
@@ -271,7 +271,7 @@ ArrayPrediction <- SWAP.KTSP.Classify(
 	DecisionFunc = function(x) sum(x) > thr_Array )
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(ArrayPrediction, ArrayGroup, positive="NEG")
+confusionMatrix(ArrayPrediction, ArrayGroup, positive="POS")
 
 ### Store thrshold
 ktspThrMechanistic <- thr_Array
@@ -306,10 +306,10 @@ thr_TCGA
 tcgaPrediction <- SWAP.KTSP.Classify(
 	tcgaMat,
 	tcgaKTSPFilt,
-	DecisionFunc = function(x) sum(x) > thr )
+	DecisionFunc = function(x) sum(x) > thr_TCGA )
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(tcgaPrediction, tcgaGroup, positive="NEG")
+confusionMatrix(tcgaPrediction, tcgaGroup, positive="POS")
 
 
 ## Rename the 2 classifiers

@@ -465,9 +465,9 @@ ktspStatsPCR <- SWAP.KTSP.Statistics(
 
 ### Prepare the legend
 forLegend_KTSP <- apply(rbind(
-  ci(roc(ArrayGroup, ktspStatsArray$statistics)),
-  ci(roc(tcgaGroup, ktspStatsTCGA$statistics)),
-  ci(roc(pcrGroup, ktspStatsPCR$statistics))
+  ci(roc(ArrayGroup, ktspStatsArray$statistics, levels = c("NEG", "POS"), direction = ">")),
+  ci(roc(tcgaGroup, ktspStatsTCGA$statistics, levels = c("NEG", "POS"), direction = ">")),
+  ci(roc(pcrGroup, ktspStatsPCR$statistics, levels = c("NEG", "POS"), direction = ">"))
 ),  1, function(x) {
   x <- format(round(x, digits=2), nsmall=2)
   paste("AUC: ", x[[2]], ";", "95% CI: ", x[[1]], "-", x[[3]])
@@ -480,7 +480,7 @@ forLegend_KTSP <- apply(rbind(
 ### Training
 datArray_KTSP <- melt(data.frame(
   ## Training Group
-  ArrayGroup= ArrayGroup,
+  ArrayGroup= factor(ArrayGroup, levels = c("NEG", "POS")),
   ## Mechanistic KTSP SUM training
   ktspStatsArray= ktspStatsArray$statistics))
 ### Change Colnames
@@ -490,7 +490,7 @@ colnames(datArray_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 ### Testing
 datTcga_KTSP <- melt(data.frame(
   ## Testing group
-  Testing= tcgaGroup,
+  Testing= factor(tcgaGroup, levels = c("NEG", "POS")),
   ## Mechanistic KTSP SUM training
   ktspStatsTCGA=ktspStatsTCGA$statistics))
 ### Change Colnames
@@ -499,7 +499,7 @@ colnames(datTcga_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 ### Testing
 datPCR_KTSP <- melt(data.frame(
   ## Testing group
-  Testing= pcrGroup,
+  Testing= factor(pcrGroup, levels = c("NEG", "POS")),
   ## Mechanistic KTSP SUM training
   ktspStatsPCR=ktspStatsPCR$statistics))
 ### Change Colnames
@@ -525,7 +525,7 @@ plotTitle <- "K-TSP Performance in the training and testing datasets"
 ### Plot
 basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
                                        linetype = Dataset)) +
-  geom_roc(cutoffs.at = seq(1,20,1)) +
+  geom_roc(increasing = F) +
   style_roc(theme = theme_grey) + ggtitle(plotTitle) +
   theme(plot.title = element_text(face="bold", size=16, hjust = 0.5),
         axis.text=element_text(face="plain", size = 11),
