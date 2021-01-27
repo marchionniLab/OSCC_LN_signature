@@ -33,3 +33,21 @@ summary(ClassifierBadGns %in% myTSPs[,1])
 
 summary(ClassifierGoodGns %in% myTSPs[,1])
 
+# PDLIM4 should be good  >> found in classifer bad &  SKI > found in both
+# GSTP1 should be good >> found in classifer bad  &   CTSB > found in both
+
+################
+# Which bad gene lists contain SKI and CTSP
+SKI_CTSP_Class <- AllBadGns[AllBadGns$BadGene %in% ClassifierGoodGns, ]
+table(SKI_CTSP_Class$BadGene, SKI_CTSP_Class$Type)
+# SKI < TAGs (oncogene)
+# CTSP < emt (pro-invasion)
+
+################
+# Which good gene lists contain PDLIM4 and GSTP1
+PDLIM4_GSTP1_Class <- AllGoodGns[AllGoodGns$GoodGene %in% ClassifierBadGns, ]
+table(PDLIM4_GSTP1_Class$GoodGene, PDLIM4_GSTP1_Class$Type)
+# PDLIM4 < immune-surveillance (immune-surveillance on) and TAGs (tumor suppressor)
+# GSTP1 < emt (anti-invasion) and growth (anti-growth)
+# TGFB2 < apoptosis (pro-apoptotic)
+
