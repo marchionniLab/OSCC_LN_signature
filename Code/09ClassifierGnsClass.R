@@ -1,5 +1,5 @@
 
-
+rm(list = ls())
 setwd("/Volumes/Macintosh/Research/Projects/HNSCC")
 
 
