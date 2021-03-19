@@ -250,7 +250,7 @@ summary(ktspStatsArray$statistics)
 thr_Array <- coords(roc(ArrayGroup, ktspStatsArray$statistics,
                   levels=c("POS", "NEG"),
 		  direction="<"), "best")["threshold"]
-thr
+thr_Array
 
 ### Print ROC curve local maximas
 auc(roc(ArrayGroup, ktspStatsArray$statistics))
