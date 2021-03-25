@@ -1,5 +1,7 @@
 
 
+rm(list = ls())
+
 library(GEOquery)
 
 
@@ -27,6 +29,28 @@ dim(Expr)
 
 range(Expr)
 
+summary(duplicated(rownames(Expr)))
+
+# ### By variance
+Expr_var <- apply(Expr, 1, var)
+Expr <- Expr[order(Expr_var, decreasing = T), ]
+Expr <- Expr[!duplicated(rownames(Expr)), ]
+
+### Normalize to GAPDH
+Expr <- sweep(Expr, 2, Expr["GAPDH",],  "-")
+Expr <- Expr[ -grep("GAPDH",  rownames(Expr)), ]
+
+###########################################################
+### Filter to classifier genes
+load("./Objs/FinalClassifiers.rda")
+
+Genes <- as.vector(ArrayKTSP$TSPs)
+
+GenesInter <- rownames(Expr) %in% Genes
+
+Expr_Filt <- Expr[GenesInter, ]
+Expr_Filt
+Expr_Filt <- t(scale(t(Expr_Filt), center = T, scale = T))
 #########################
 ## Process the phenotype
 table(Pheno$`tumor site:ch1`)
@@ -43,8 +67,8 @@ Pheno$NodeStatus <- as.factor(Pheno$`node status:ch1`)
 levels(Pheno$NodeStatus) <- c("NEG", "POS", "POS", "POS")
 
 
-Expr <- Expr[, colnames(Expr) %in% rownames(Pheno)]
-all(rownames(Pheno) == colnames(Expr))
+Expr_Filt <- Expr_Filt[, colnames(Expr_Filt) %in% rownames(Pheno)]
+all(rownames(Pheno) == colnames(Expr_Filt))
 
 #############################
 ## Test
@@ -52,7 +76,7 @@ load("./Objs/FinalClassifiers.rda")
 
 
 ClassifierGenes <- as.vector(ArrayKTSP$TSPs)
-InterSect <- intersect(ClassifierGenes, rownames(Expr))
+InterSect <- intersect(ClassifierGenes, rownames(Expr_Filt))
 
 keep <- names(ArrayKTSP$score)[c(1,3:6)]
 
@@ -65,7 +89,7 @@ ArrayKTSPFilt$name <- paste(nrow(ArrayKTSPFilt$TSPs), "TSPS")
 
 ### Compute the sum and find the best threshold: ALL TRAINING SAMPLES
 ktspStatsGSE39366 <- SWAP.KTSP.Statistics(
-  inputMat = Expr,
+  inputMat = Expr_Filt,
   classifier = ArrayKTSPFilt,
   CombineFunc = sum)
 

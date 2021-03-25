@@ -3,18 +3,18 @@ library(GEOquery)
 
 
 
-GSE30788 <- getGEO("GSE30788", GSEMatrix = T, AnnotGPL = T)
-GSE30788_1 <- GSE30788$`GSE30788-GPL13952_series_matrix.txt.gz`
+GSE84846 <- getGEO("GSE84846", GSEMatrix = T, AnnotGPL = T)
+GSE84846 <- GSE84846$GSE84846_series_matrix.txt.gz
 
 
-Expr <- exprs(GSE30788_1)
-Pheno <- pData(GSE30788_1)
-FeatData <- fData(GSE30788_1)
+Expr <- exprs(GSE84846)
+Pheno <- pData(GSE84846)
+FeatData <- fData(GSE84846)
 
 
 ###########################
 ## Process the expression
-rownames(Expr) <- FeatData$gene_symbol
+rownames(Expr) <- FeatData$`Gene symbol`
 summary(is.na(rownames(Expr)))
 rownames(Expr) <- gsub("-","", rownames(Expr))
 rownames(Expr) <- gsub("_","",rownames(Expr))
@@ -36,8 +36,8 @@ Expr <- Expr[!duplicated(rownames(Expr)), ]
 
 
 ### Normalize to GAPDH
-Expr <- sweep(Expr, 2, Expr["GAPDH",],  "-")
-Expr <- Expr[ -grep("GAPDH",  rownames(Expr)), ]
+#Expr <- sweep(Expr, 2, Expr["GAPDH",],  "-")
+#Expr <- Expr[ -grep("GAPDH",  rownames(Expr)), ]
 
 #####################################
 ### Filter to classifier genes
@@ -48,27 +48,29 @@ Genes <- as.vector(ArrayKTSP$TSPs)
 GenesInter <- rownames(Expr) %in% Genes
 
 Expr_Filt <- Expr[GenesInter, ]
-Expr_Filt
+dim(Expr_Filt)
 Expr_Filt <- t(scale(t(Expr_Filt), center = T, scale = T))
 
 #########################
 ## Process the phenotype
-table(Pheno$`location:ch1`)
+#table(Pheno$`location:ch1`)
+
 #table(Pheno$`hpv:ch1`)
-table(Pheno$`pt:ch1`)
+#table(Pheno$`pt:ch1`)
 
-Pheno <- Pheno[Pheno$`location:ch1` == "oral cavity", ]
-Pheno <- Pheno[Pheno$`pt:ch1` %in% c("1", "2"), ]
+#Pheno <- Pheno[Pheno$`location:ch1` == "oral cavity", ]
+#Pheno <- Pheno[Pheno$`pt:ch1` %in% c("1", "2"), ]
 
-table(Pheno$`pn (pathological n-status = lymph node metastasis status):ch1`)
+table(Pheno$`pnstage:ch1`)
 
 #Pheno <- Pheno[!(Pheno$`Stage:ch1` == "NA"), ]
 
-Pheno$NodeStatus <- Pheno$`pn (pathological n-status = lymph node metastasis status):ch1`
-
+Pheno$NodeStatus <- Pheno$`pnstage:ch1`
+Pheno <- Pheno[!(Pheno$NodeStatus == "NA"), ]
 
 Pheno$NodeStatus <- as.factor(Pheno$NodeStatus)
-levels(Pheno$NodeStatus) <- c("NEG", "POS")
+levels(Pheno$NodeStatus) <- c("NEG", "POS", "POS", "POS", "POS", "POS")
+table(Pheno$NodeStatus)
 #Pheno$NodeStatus <- factor(Pheno$NodeStatus, levels = c("NEG", "POS"))
 
 Expr_Filt <- Expr_Filt[, colnames(Expr_Filt) %in% rownames(Pheno)]
@@ -82,7 +84,7 @@ load("./Objs/FinalClassifiers.rda")
 ClassifierGenes <- as.vector(ArrayKTSP$TSPs)
 InterSect <- intersect(ClassifierGenes, rownames(Expr_Filt))
 
-keep <- names(ArrayKTSP$score)[c(1,3,5,6)]
+keep <- names(ArrayKTSP$score)[c(1:5)]
 
 ArrayKTSPFilt <- ArrayKTSP
 ArrayKTSPFilt$score <- ArrayKTSPFilt$score[keep]
@@ -92,21 +94,21 @@ ArrayKTSPFilt$name <- paste(nrow(ArrayKTSPFilt$TSPs), "TSPS")
 
 
 ### Compute the sum and find the best threshold: ALL TRAINING SAMPLES
-ktspStatsGSE30788 <- SWAP.KTSP.Statistics(
+ktspStatsGSE84846 <- SWAP.KTSP.Statistics(
   inputMat = Expr_Filt,
   classifier = ArrayKTSPFilt,
   CombineFunc = sum)
 
-summary(ktspStatsGSE30788$statistics)
+summary(ktspStatsGSE84846$statistics)
 
 
 ### Print ROC curve local maximas
-auc(roc(Pheno$NodeStatus, ktspStatsGSE30788$statistics, levels=c("POS", "NEG"),
+auc(roc(Pheno$NodeStatus, ktspStatsGSE84846$statistics, levels=c("POS", "NEG"),
         direction="<"))
 
 ### Get prediction based on best threshold from ROC curve
 ### Note the use of ">"
-GSE30788Prediction <- SWAP.KTSP.Classify(
+GSE84846Prediction <- SWAP.KTSP.Classify(
   Expr_Filt,
   ArrayKTSPFilt,
   DecisionFunc = function(x) sum(x) > 2.5 )
@@ -115,7 +117,7 @@ Pheno$NodeStatus <- factor(Pheno$NodeStatus, levels = c("POS", "NEG"))
 table(Pheno$NodeStatus)
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(GSE30788Prediction, Pheno$NodeStatus, positive="POS")
+confusionMatrix(GSE84846Prediction, Pheno$NodeStatus, positive="POS")
 
 ###############################
 

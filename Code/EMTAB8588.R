@@ -14,9 +14,12 @@ ArrayDesign <- read.delim("./Data/EMTAB8588/ArrayDesign.txt")
 ## Process the expression
 Common <- intersect(ArrayDesign$Array.Design.Name, rownames(Expr))
 ArrayDesign <- ArrayDesign[ArrayDesign$Array.Design.Name %in% Common, ]
-ArrayDesign <- ArrayDesign[!duplicated(ArrayDesign$X.2), ]
-Common2 <- intersect(ArrayDesign$Array.Design.Name, rownames(Expr))
-Expr <- Expr[Common2, ]
+
+Expr <- as.matrix(Expr)
+
+#ArrayDesign <- ArrayDesign[!duplicated(ArrayDesign$X.2), ]
+#Common2 <- intersect(ArrayDesign$Array.Design.Name, rownames(Expr))
+Expr <- Expr[Common, ]
 all(rownames(Expr) == ArrayDesign$Array.Design.Name)
 
 
@@ -32,7 +35,31 @@ dim(Expr)
 
 range(Expr)
 
-#Expr <- log2(Expr)
+################
+## Collapse duplicate genes by variance
+summary(duplicated(rownames(Expr)))
+
+Expr_var <- apply(Expr, 1, var)
+Expr <- Expr[order(Expr_var, decreasing = T), ]
+Expr <- Expr[!duplicated(rownames(Expr)), ]
+
+
+### Normalize to GAPDH
+Expr <- sweep(Expr, 2, Expr["GAPDH",],  "-")
+Expr <- Expr[ -grep("GAPDH",  rownames(Expr)), ]
+
+#####################################
+### Filter to classifier genes
+load("./Objs/FinalClassifiers.rda")
+
+Genes <- as.vector(ArrayKTSP$TSPs)
+
+GenesInter <- rownames(Expr) %in% Genes
+
+Expr_Filt <- Expr[GenesInter, ]
+Expr_Filt
+Expr_Filt <- t(scale(t(Expr_Filt), center = T, scale = T))
+
 #########################
 ## Process the phenotype
 table(Pheno$Characteristics.sampling.site.)
@@ -56,23 +83,23 @@ levels(Pheno$NodeStatus) <- c("NEG", "POS", "POS", "POS", "POS")
 #Pheno$NodeStatus <- factor(Pheno$NodeStatus, levels = c("NEG", "POS"))
 rownames(Pheno) <- Pheno$Source.Name
 
-colnames(Expr) <- gsub("X", "", colnames(Expr))
+colnames(Expr_Filt) <- gsub("X", "", colnames(Expr_Filt))
 
-CommSamples <- intersect(rownames(Pheno), colnames(Expr))
+CommSamples <- intersect(rownames(Pheno), colnames(Expr_Filt))
 
-Expr <- Expr[, CommSamples]
+Expr_Filt <- Expr_Filt[, CommSamples]
 Pheno <- Pheno[CommSamples, ]
 
-all(rownames(Pheno) == colnames(Expr))
+all(rownames(Pheno) == colnames(Expr_Filt))
 
-Expr <- as.matrix(Expr)
+#Expr <- as.matrix(Expr)
 #############################
 ## Test
 load("./Objs/FinalClassifiers.rda")
 
 
 ClassifierGenes <- as.vector(ArrayKTSP$TSPs)
-InterSect <- intersect(ClassifierGenes, rownames(Expr))
+InterSect <- intersect(ClassifierGenes, rownames(Expr_Filt))
 
 keep <- names(ArrayKTSP$score)[c(1,3:6)]
 
@@ -85,7 +112,7 @@ ArrayKTSPFilt$name <- paste(nrow(ArrayKTSPFilt$TSPs), "TSPS")
 
 ### Compute the sum and find the best threshold: ALL TRAINING SAMPLES
 ktspStats <- SWAP.KTSP.Statistics(
-  inputMat = Expr,
+  inputMat = Expr_Filt,
   classifier = ArrayKTSPFilt,
   CombineFunc = sum)
 
@@ -99,7 +126,7 @@ auc(roc(Pheno$NodeStatus, ktspStats$statistics, levels=c("POS", "NEG"),
 ### Get prediction based on best threshold from ROC curve
 ### Note the use of ">"
 Prediction <- SWAP.KTSP.Classify(
-  Expr,
+  Expr_Filt,
   ArrayKTSPFilt,
   DecisionFunc = function(x) sum(x) > 2.5 )
 
