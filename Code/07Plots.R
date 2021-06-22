@@ -7,6 +7,7 @@ library(switchBox)
 library(superheat)
 library(reshape2)
 library(pROC)
+library(plotROC)
 
 ## Load the 2 classifiers and data
 load("./Objs/FinalClassifiers.rda")
@@ -165,6 +166,7 @@ Array_Stats <- Array_Stats*1
 NewOrder <- order(rowSums(Array_Stats))
 Array_Stats <- Array_Stats[NewOrder, ]
 
+
 #GroupCol <- ArrayGroup[NewOrder]
 #levels(GroupCol) <- c("red", "blue")
 
@@ -178,9 +180,17 @@ levels(PredClass) <- c("red", "blue")
 # Check order 
 all(rownames(Array_Stats) == names(PredClass)) # TRUE:: No Need to order them (Already ordered by sum of votes) 
 
+# Samples <- rownames(Array_Stats)
+# Array_Stats <- apply(Array_Stats, 2, as.character)
+# rownames(Array_Stats) <- Samples
+
 # Plot
 png(filename = "./Figs/Heatmaps/ArrayKTSP_Heatmap.png", width = 3000, height = 2000, res = 200)
 superheat(Array_Stats, col.dendrogram = F, yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the array dataset")
+dev.off()
+
+pdf("./Figs/Heatmaps/SuppFigure2.pdf", width = 10, height = 9, onefile = F)
+superheat(Array_Stats, col.dendrogram = F, yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap of the TSPs votes in the array dataset")
 dev.off()
 
 ########
@@ -212,6 +222,10 @@ all(rownames(TCGA_Stats) == names(PredClass)) # TRUE:: No Need to order them (Al
 
 png(filename = "./Figs/Heatmaps/TcgaKTSP_Heatmap.png", width = 3000, height = 2000, res = 200)
 superheat(TCGA_Stats, col.dendrogram = F, yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
+dev.off()
+
+pdf("./Figs/Heatmaps/SuppFigure3.pdf", width = 10, height = 9, onefile = F)
+superheat(TCGA_Stats, col.dendrogram = F, yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
 dev.off()
 
 ########
@@ -267,6 +281,10 @@ png(filename = "./Figs/Heatmaps/PcrKTSP_Heatmap.png", width = 3000, height = 200
 superheat(PCR_Stats, col.dendrogram = F, yr = rowSums(PCR_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = pcrGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the PCR (Testing) dataset")
 dev.off()
 
+
+pdf("./Figs/Heatmaps/Figure1.pdf", width = 10, height = 9, onefile = F)
+superheat(PCR_Stats, col.dendrogram = F, yr = rowSums(PCR_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = pcrGroup, bottom.label.text.size = 2, yr.num.ticks = 4, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the PCR (Testing) dataset")
+dev.off()
 #################################################################################################
 ## MDS Plots
 
@@ -541,6 +559,10 @@ basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
 ### Plot
 basicplot_KTSP
 ### Close device
+dev.off()
+
+pdf("./Figs/Heatmaps/Figure2.pdf", width = 10, height = 9, onefile = F)
+basicplot_KTSP
 dev.off()
 
 save(basicplot_KTSP, file = "./Objs/BasicPlot_KTSP.rda")

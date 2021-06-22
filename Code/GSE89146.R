@@ -1,12 +1,20 @@
 
 rm(list = ls())
+
 library(GEOquery)
+library(limma)
+library(caret)
+library(ggplot2)
+library(pROC)
+library(switchBox)
 
 
+#GSE89146 <- getGEO("GSE89146", GSEMatrix = T, AnnotGPL = T)
+#GSE89146 <- GSE89146$GSE89146_series_matrix.txt.gz
 
-GSE89146 <- getGEO("GSE89146", GSEMatrix = T, AnnotGPL = T)
-GSE89146 <- GSE89146$GSE89146_series_matrix.txt.gz
+#save(GSE89146, file = "./Data/GSE89146.rda")
 
+load("./Data/GSE89146.rda")
 
 Expr <- exprs(GSE89146)
 Pheno <- pData(GSE89146)
@@ -38,18 +46,10 @@ Expr <- Expr[!duplicated(rownames(Expr)), ]
 
 
 ### By median
-#Expr <- apply(Expr, 2, function(x,gns) tapply(x,gns, median), gns=rownames(Expr))
+#Expr <- apply(Expr, 2, function(x,gns) tapply(x,gns, mean), gns=rownames(Expr))
 
 ### Normalize to GAPDH
 Expr <- sweep(Expr, 2, Expr["GAPDH",],  "-")
-
-
-# table(rownames(Expr) %in% "GAPDH")
-# GAPDH <- Expr[rownames(Expr) %in% "GAPDH", ]
-# pairs(t(GAPDH))
-
-boxplot(Expr)
-
 Expr <- Expr[ -grep("GAPDH",  rownames(Expr)), ]
 
 
@@ -87,9 +87,9 @@ table(Pheno$`Stage:ch1`)
 Pheno <- Pheno[!(Pheno$`Stage:ch1` == "NA"), ]
 
 # All are T1, T2
-#Pheno$T_stage <- Pheno$`Stage:ch1`
-#Pheno$T_stage <- gsub("N.+", "", Pheno$T_stage)
-
+Pheno$T_stage <- Pheno$`Stage:ch1`
+Pheno$T_stage <- gsub("N.+", "", Pheno$T_stage)
+table(Pheno$T_stage)
 
 Pheno$NodeStatus <- Pheno$`Stage:ch1`
 Pheno$NodeStatus <- gsub(".+N", "N", Pheno$NodeStatus)
