@@ -51,4 +51,11 @@ pcrGroup <- factor(pcrGroup, levels = c("POS", "NEG"))
 table(pcrGroup)
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(pcrPrediction, pcrGroup, positive="POS")
+PCRperf <- confusionMatrix(pcrPrediction, pcrGroup, positive="POS")
+PCRperf_Classes <- as.matrix(PCRperf, what = "classes")
+PCRperf_Xtabs <- as.matrix(PCRperf, what = "xtabs")
+
+write.csv(PCRperf_Xtabs, file = "./objs/Performance_All/PCR_Xtabs.csv")
+
+write.csv(PCRperf_Classes, file = "./objs/Performance_All/PCR_Performance.csv")
+

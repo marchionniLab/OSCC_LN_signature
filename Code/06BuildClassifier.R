@@ -270,7 +270,13 @@ ArrayPrediction <- SWAP.KTSP.Classify(
 	DecisionFunc = function(x) sum(x) > thr_Array )
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(ArrayPrediction, ArrayGroup, positive="POS")
+PerfArray <- confusionMatrix(ArrayPrediction, ArrayGroup, positive="POS")
+
+PerfArray_Classes <- as.matrix(PerfArray, what = "classes")
+PerfArray_Xtabs <- as.matrix(PerfArray, what = "xtabs")
+
+write.csv(PerfArray_Classes, file = "./objs/Performance_All/ArrayPerformance.csv")
+write.csv(PerfArray_Xtabs, file = "./objs/Performance_All/Array_Xtabs.csv")
 
 ### Store thrshold
 ktspThrMechanistic <- thr_Array
@@ -285,6 +291,7 @@ ktspStatsTcga <- SWAP.KTSP.Statistics(
 	inputMat = tcgaMat,
 	classifier = tcgaKTSPFilt,
 	CombineFunc = sum)
+
 summary(ktspStatsTcga$statistics)
 
 ### print ROC curve local maximas
@@ -308,7 +315,12 @@ tcgaPrediction <- SWAP.KTSP.Classify(
 	DecisionFunc = function(x) sum(x) > thr_TCGA )
 
 ### Resubstitution performance in the TRAINING set
-confusionMatrix(tcgaPrediction, tcgaGroup, positive="POS")
+PerfTCGA <- confusionMatrix(tcgaPrediction, tcgaGroup, positive="POS")
+PerfTCGA_Classes <- as.matrix(PerfTCGA, what = "classes")
+PerfTCGA_Xtabs <- as.matrix(PerfTCGA, what = "xtabs")
+
+write.csv(PerfTCGA_Classes, file = "./objs/Performance_All/TCGAPerformance.csv")
+write.csv(PerfTCGA_Xtabs, file = "./objs/Performance_All/TCGA_Xtabs.csv")
 
 
 ## Rename the 2 classifiers

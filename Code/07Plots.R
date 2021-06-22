@@ -17,135 +17,135 @@ load("./Objs/FinalClassifiers.rda")
 ###########################################################################
 ### Plot genes in the training set (the 2 array datsets)
 ## Which TSPs
-i <- 1:nrow(ArrayKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=ArrayKTSP$TSPs)
-
-## Assemble
-dfTspArray <- lapply(tsp, function(i,x,g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), out)
-}, x=ArrayMat, g=ArrayGroup)
-
-names(dfTspArray) <- rownames(ArrayKTSP$TSPs)
-
-# Change the names of elements inside each element in dfTspTrain (For Plotting)  
-for(i in seq_along(dfTspArray)) names(dfTspArray[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
-
-## Reduce
-datArray <- Reduce("rbind", dfTspArray)
-
-##
-## Scatter plot
-png(filename = "./Figs/ScatterPlots/KTSP_Array_ScatterPlot.png", width=3000, height=1500, res=300)
-### Prepare ggplot
-sctplt <- ggplot(na.omit(datArray), aes(x=Gene1, y=Gene2, color=Group)) +
-  geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
-  facet_wrap(~ pair, scales="free", nrow=2) +
-  theme(axis.text=element_text(face="bold", size = 12),
-        axis.title=element_text(face="bold", size = 12),
-        legend.position="bottom",
-        legend.text=element_text(face="bold", size=17.5),
-        legend.title = element_text(face="bold", size=17.5),
-        strip.text.x = element_text(face="bold", size=11))
-sctplt
-dev.off()
-
-###########################################################################
-### Plot genes in the test set (the tcga datset)
-## Which TSPs
-i <- 1:nrow(tcgaKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=tcgaKTSP$TSPs)
-
-## Assemble
-dfTspTcga <- lapply(tsp, function(i,x,g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair = paste("TSP:", paste(i, collapse = "-")), out)
-}, x = tcgaMat, g = tcgaGroup)
-
-names(dfTspTcga) <- rownames(tcgaKTSP$TSPs)
-
-# Change the names of elements inside each element in dfTspTrain (For Plotting)  
-for(i in seq_along(dfTspTcga)) names(dfTspTcga[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
-
-## Reduce
-datTcga <- Reduce("rbind", dfTspTcga)
-
-####
-## Scatter plots
-png(filename = "./Figs/ScatterPlots/KTSP_TCGA_ScatterPlot.png", width=3000, height=1500, res=300)
-### Prepare ggplot
-sctplt <- ggplot(na.omit(datTcga), aes(x=Gene1, y=Gene2, color=Group)) +
-  geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
-  facet_wrap(~ pair, scales="free", nrow=2) +
-  theme(axis.text=element_text(face="bold", size = 12),
-        axis.title=element_text(face="bold", size = 12),
-        legend.position="bottom",
-        legend.text=element_text(face="bold", size=17.5),
-        legend.title = element_text(face="bold", size=17.5),
-        strip.text.x = element_text(face="bold", size=11))
-sctplt
-dev.off()
-
-#################################
-## Load the RT-PCR data
-pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
-
-# Get the node status
-pcrGroup <- pcrData$NodeStatus
-table(pcrGroup)
-# Rename the groups from 0,1 to neg,pos
-pcrGroup[pcrGroup == 0] <- "NEG"
-pcrGroup[pcrGroup == 1] <- "POS"
-
-# Get the matrix
-pcrMat <- pcrData[, -14]
-rownames(pcrMat) <- pcrMat$SampleName
-pcrMat$SampleName <- NULL
-
-# Transpose the matrix
-pcrMat <- t(pcrMat)
-
-# One gene is misspelled, rename it
-rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
-
-## Which TSPs
-i <- 1:nrow(tcgaKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=tcgaKTSP$TSPs)
-
-## Assemble
-dfTspPCR <- lapply(tsp, function(i,x,g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), out)
-}, x=pcrMat, g=pcrGroup)
-
-names(dfTspPCR) <- rownames(tcgaKTSP$TSPs)
-
-# Change the names of elements inside each element in dfTspTrain (For Plotting)  
-for(i in seq_along(dfTspPCR)) names(dfTspPCR[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
-
-## Reduce
-datPCR <- Reduce("rbind", dfTspPCR)
-
-## Scatter plots
-png(filename = "./Figs/ScatterPlots/KTSP_PCR_ScatterPlot.png", width=3000, height=1500, res=300)
-### Prepare ggplot
-sctplt <- ggplot(na.omit(datPCR), aes(x=Gene1, y=Gene2, color=Group)) +
-  geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
-  facet_wrap(~ pair, scales="free", nrow=2) +
-  theme(axis.text=element_text(face="bold", size = 12),
-        axis.title=element_text(face="bold", size = 12),
-        legend.position="bottom",
-        legend.text=element_text(face="bold", size=17.5),
-        legend.title = element_text(face="bold", size=17.5),
-        strip.text.x = element_text(face="bold", size=11))
-sctplt
-dev.off()
+# i <- 1:nrow(ArrayKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=ArrayKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspArray <- lapply(tsp, function(i,x,g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), out)
+# }, x=ArrayMat, g=ArrayGroup)
+# 
+# names(dfTspArray) <- rownames(ArrayKTSP$TSPs)
+# 
+# # Change the names of elements inside each element in dfTspTrain (For Plotting)  
+# for(i in seq_along(dfTspArray)) names(dfTspArray[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
+# 
+# ## Reduce
+# datArray <- Reduce("rbind", dfTspArray)
+# 
+# ##
+# ## Scatter plot
+# png(filename = "./Figs/ScatterPlots/KTSP_Array_ScatterPlot.png", width=3000, height=1500, res=300)
+# ### Prepare ggplot
+# sctplt <- ggplot(na.omit(datArray), aes(x=Gene1, y=Gene2, color=Group)) +
+#   geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
+#   facet_wrap(~ pair, scales="free", nrow=2) +
+#   theme(axis.text=element_text(face="bold", size = 12),
+#         axis.title=element_text(face="bold", size = 12),
+#         legend.position="bottom",
+#         legend.text=element_text(face="bold", size=17.5),
+#         legend.title = element_text(face="bold", size=17.5),
+#         strip.text.x = element_text(face="bold", size=11))
+# sctplt
+# dev.off()
+# 
+# ###########################################################################
+# ### Plot genes in the test set (the tcga datset)
+# ## Which TSPs
+# i <- 1:nrow(tcgaKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=tcgaKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspTcga <- lapply(tsp, function(i,x,g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair = paste("TSP:", paste(i, collapse = "-")), out)
+# }, x = tcgaMat, g = tcgaGroup)
+# 
+# names(dfTspTcga) <- rownames(tcgaKTSP$TSPs)
+# 
+# # Change the names of elements inside each element in dfTspTrain (For Plotting)  
+# for(i in seq_along(dfTspTcga)) names(dfTspTcga[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
+# 
+# ## Reduce
+# datTcga <- Reduce("rbind", dfTspTcga)
+# 
+# ####
+# ## Scatter plots
+# png(filename = "./Figs/ScatterPlots/KTSP_TCGA_ScatterPlot.png", width=3000, height=1500, res=300)
+# ### Prepare ggplot
+# sctplt <- ggplot(na.omit(datTcga), aes(x=Gene1, y=Gene2, color=Group)) +
+#   geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
+#   facet_wrap(~ pair, scales="free", nrow=2) +
+#   theme(axis.text=element_text(face="bold", size = 12),
+#         axis.title=element_text(face="bold", size = 12),
+#         legend.position="bottom",
+#         legend.text=element_text(face="bold", size=17.5),
+#         legend.title = element_text(face="bold", size=17.5),
+#         strip.text.x = element_text(face="bold", size=11))
+# sctplt
+# dev.off()
+# 
+# #################################
+# ## Load the RT-PCR data
+# pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
+# 
+# # Get the node status
+# pcrGroup <- pcrData$NodeStatus
+# table(pcrGroup)
+# # Rename the groups from 0,1 to neg,pos
+# pcrGroup[pcrGroup == 0] <- "NEG"
+# pcrGroup[pcrGroup == 1] <- "POS"
+# 
+# # Get the matrix
+# pcrMat <- pcrData[, -14]
+# rownames(pcrMat) <- pcrMat$SampleName
+# pcrMat$SampleName <- NULL
+# 
+# # Transpose the matrix
+# pcrMat <- t(pcrMat)
+# 
+# # One gene is misspelled, rename it
+# rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
+# 
+# ## Which TSPs
+# i <- 1:nrow(tcgaKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=tcgaKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspPCR <- lapply(tsp, function(i,x,g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), out)
+# }, x=pcrMat, g=pcrGroup)
+# 
+# names(dfTspPCR) <- rownames(tcgaKTSP$TSPs)
+# 
+# # Change the names of elements inside each element in dfTspTrain (For Plotting)  
+# for(i in seq_along(dfTspPCR)) names(dfTspPCR[[i]]) <-  c("pair", "Gene1", "Gene2", "Group")
+# 
+# ## Reduce
+# datPCR <- Reduce("rbind", dfTspPCR)
+# 
+# ## Scatter plots
+# png(filename = "./Figs/ScatterPlots/KTSP_PCR_ScatterPlot.png", width=3000, height=1500, res=300)
+# ### Prepare ggplot
+# sctplt <- ggplot(na.omit(datPCR), aes(x=Gene1, y=Gene2, color=Group)) +
+#   geom_point(size=0.75) + geom_abline(intercept=0, slope=1, alpha=0.5) +
+#   facet_wrap(~ pair, scales="free", nrow=2) +
+#   theme(axis.text=element_text(face="bold", size = 12),
+#         axis.title=element_text(face="bold", size = 12),
+#         legend.position="bottom",
+#         legend.text=element_text(face="bold", size=17.5),
+#         legend.title = element_text(face="bold", size=17.5),
+#         strip.text.x = element_text(face="bold", size=11))
+# sctplt
+# dev.off()
 
 ##################################################################################################
 ### Heatmaps
@@ -180,17 +180,18 @@ levels(PredClass) <- c("red", "blue")
 # Check order 
 all(rownames(Array_Stats) == names(PredClass)) # TRUE:: No Need to order them (Already ordered by sum of votes) 
 
+
 # Samples <- rownames(Array_Stats)
-# Array_Stats <- apply(Array_Stats, 2, as.character)
+# Array_Stats <- apply(Array_Stats, 2, as.integer)
 # rownames(Array_Stats) <- Samples
 
 # Plot
 png(filename = "./Figs/Heatmaps/ArrayKTSP_Heatmap.png", width = 3000, height = 2000, res = 200)
-superheat(Array_Stats, col.dendrogram = F, yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the array dataset")
+superheat(Array_Stats, col.dendrogram = F, heat.pal = c("royalblue4", "darkolivegreen3"), heat.pal.values = c(0, 1), yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the array dataset")
 dev.off()
 
 pdf("./Figs/Heatmaps/SuppFigure2.pdf", width = 10, height = 9, onefile = F)
-superheat(Array_Stats, col.dendrogram = F, yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap of the TSPs votes in the array dataset")
+superheat(Array_Stats, col.dendrogram = F, heat.pal = c("royalblue4", "darkolivegreen3"), heat.pal.values = c(0, 1), yr = rowSums(Array_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = ArrayGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap of the TSPs votes in the array dataset")
 dev.off()
 
 ########
@@ -221,11 +222,11 @@ all(rownames(TCGA_Stats) == names(PredClass)) # TRUE:: No Need to order them (Al
 
 
 png(filename = "./Figs/Heatmaps/TcgaKTSP_Heatmap.png", width = 3000, height = 2000, res = 200)
-superheat(TCGA_Stats, col.dendrogram = F, yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
+superheat(TCGA_Stats, col.dendrogram = F, heat.pal.values = c(0, 1), yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 3.5, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
 dev.off()
 
 pdf("./Figs/Heatmaps/SuppFigure3.pdf", width = 10, height = 9, onefile = F)
-superheat(TCGA_Stats, col.dendrogram = F, yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
+superheat(TCGA_Stats, col.dendrogram = F, heat.pal = c("royalblue4", "darkolivegreen3"), heat.pal.values = c(0, 1), yr = rowSums(TCGA_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = tcgaGroup, bottom.label.text.size = 2, yr.num.ticks = 6, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the TCGA dataset")
 dev.off()
 
 ########
@@ -283,80 +284,80 @@ dev.off()
 
 
 pdf("./Figs/Heatmaps/Figure1.pdf", width = 10, height = 9, onefile = F)
-superheat(PCR_Stats, col.dendrogram = F, yr = rowSums(PCR_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = pcrGroup, bottom.label.text.size = 2, yr.num.ticks = 4, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the PCR (Testing) dataset")
+superheat(PCR_Stats, col.dendrogram = F,  heat.pal = c("royalblue4", "darkolivegreen3"), heat.pal.values = c(0, 1), yr = rowSums(PCR_Stats), yr.plot.type  = "bar", left.label.text.col = c("red", "blue"), membership.rows = pcrGroup, bottom.label.text.size = 2, yr.num.ticks = 4, yr.axis.name	= "Sum of votes", yr.obs.col = PredClass, title = "Heatmap for the TSPs votes in the PCR (Testing) dataset")
 dev.off()
 #################################################################################################
 ## MDS Plots
 
 # 1- Arrays
-Array_Stats <- ktspStatsArray$comparisons
-Array_Stats <- Array_Stats*1
-Array_Stats <- as.data.frame(Array_Stats)
-Array_Stats$Group <- ArrayGroup
-
-Array_Stats_WithoutLabels <- Array_Stats
-Array_Stats_WithoutLabels$Group <- NULL
-
-Array_Stats_Dist <- dist(as.matrix(Array_Stats_WithoutLabels))
-
-MDS_Array_Stats_WithoutLabels <- cmdscale(Array_Stats_Dist)
-
-x <- MDS_Array_Stats_WithoutLabels[,1]
-y <- MDS_Array_Stats_WithoutLabels[,2]
-
-png(filename = "./Figs/MDS_Plots/MDS_Array.png", width = 2500, height = 2000, res = 300)
-plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
-     main="Array MDS", col = as.numeric(ArrayGroup), pch = 16)
-#abline(0,1)
-text(x, y, labels = ktspStatsArray$statistics, cex=1 ,pos = 1, col = as.numeric(ArrayGroup),)
-dev.off()
-#######
-# 2- TCGA
-Tcga_Stats <- ktspStatsTCGA$comparisons
-Tcga_Stats <- Tcga_Stats*1
-Tcga_Stats <- as.data.frame(Tcga_Stats)
-Tcga_Stats$Group <- tcgaGroup
-
-Tcga_Stats_WithoutLabels <- Tcga_Stats
-Tcga_Stats_WithoutLabels$Group <- NULL
-
-Tcga_Stats_Dist <- dist(as.matrix(Tcga_Stats_WithoutLabels))
-
-MDS_Tcga_Stats_WithoutLabels <- cmdscale(Tcga_Stats_Dist)
-
-x <- MDS_Tcga_Stats_WithoutLabels[,1]
-y <- MDS_Tcga_Stats_WithoutLabels[,2]
-
-png(filename = "./Figs/MDS_Plots/MDS_Tcga.png", width = 2500, height = 2000, res = 300)
-plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
-     main="Tcga MDS", col = as.numeric(tcgaGroup), pch = 16)
-#abline(0,1)
-text(x, y, labels = ktspStatsTCGA$statistics, cex=1 ,pos = 1, col = as.numeric(tcgaGroup),)
-dev.off()
-
-#######
-# 2- PCR
-PCR_Stats <- ktspStatsPCR$comparisons
-PCR_Stats <- PCR_Stats*1
-PCR_Stats <- as.data.frame(PCR_Stats)
-PCR_Stats$Group <- pcrGroup
-
-PCR_Stats_WithoutLabels <- PCR_Stats
-PCR_Stats_WithoutLabels$Group <- NULL
-
-PCR_Stats_Dist <- dist(as.matrix(PCR_Stats_WithoutLabels))
-
-MDS_PCR_Stats_WithoutLabels <- cmdscale(PCR_Stats_Dist)
-
-x <- MDS_PCR_Stats_WithoutLabels[,1]
-y <- MDS_PCR_Stats_WithoutLabels[,2]
-
-png(filename = "./Figs/MDS_Plots/MDS_PCR.png", width = 2500, height = 2000, res = 300)
-plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
-     main="PCR MDS", col = as.numeric(pcrGroup), pch = 16)
-#abline(0,1)
-text(x, y, labels = ktspStatsPCR$statistics, cex=1 ,pos = 1, col = as.numeric(pcrGroup),)
-dev.off()
+# Array_Stats <- ktspStatsArray$comparisons
+# Array_Stats <- Array_Stats*1
+# Array_Stats <- as.data.frame(Array_Stats)
+# Array_Stats$Group <- ArrayGroup
+# 
+# Array_Stats_WithoutLabels <- Array_Stats
+# Array_Stats_WithoutLabels$Group <- NULL
+# 
+# Array_Stats_Dist <- dist(as.matrix(Array_Stats_WithoutLabels))
+# 
+# MDS_Array_Stats_WithoutLabels <- cmdscale(Array_Stats_Dist)
+# 
+# x <- MDS_Array_Stats_WithoutLabels[,1]
+# y <- MDS_Array_Stats_WithoutLabels[,2]
+# 
+# png(filename = "./Figs/MDS_Plots/MDS_Array.png", width = 2500, height = 2000, res = 300)
+# plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
+#      main="Array MDS", col = as.numeric(ArrayGroup), pch = 16)
+# #abline(0,1)
+# text(x, y, labels = ktspStatsArray$statistics, cex=1 ,pos = 1, col = as.numeric(ArrayGroup),)
+# dev.off()
+# #######
+# # 2- TCGA
+# Tcga_Stats <- ktspStatsTCGA$comparisons
+# Tcga_Stats <- Tcga_Stats*1
+# Tcga_Stats <- as.data.frame(Tcga_Stats)
+# Tcga_Stats$Group <- tcgaGroup
+# 
+# Tcga_Stats_WithoutLabels <- Tcga_Stats
+# Tcga_Stats_WithoutLabels$Group <- NULL
+# 
+# Tcga_Stats_Dist <- dist(as.matrix(Tcga_Stats_WithoutLabels))
+# 
+# MDS_Tcga_Stats_WithoutLabels <- cmdscale(Tcga_Stats_Dist)
+# 
+# x <- MDS_Tcga_Stats_WithoutLabels[,1]
+# y <- MDS_Tcga_Stats_WithoutLabels[,2]
+# 
+# png(filename = "./Figs/MDS_Plots/MDS_Tcga.png", width = 2500, height = 2000, res = 300)
+# plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
+#      main="Tcga MDS", col = as.numeric(tcgaGroup), pch = 16)
+# #abline(0,1)
+# text(x, y, labels = ktspStatsTCGA$statistics, cex=1 ,pos = 1, col = as.numeric(tcgaGroup),)
+# dev.off()
+# 
+# #######
+# # 2- PCR
+# PCR_Stats <- ktspStatsPCR$comparisons
+# PCR_Stats <- PCR_Stats*1
+# PCR_Stats <- as.data.frame(PCR_Stats)
+# PCR_Stats$Group <- pcrGroup
+# 
+# PCR_Stats_WithoutLabels <- PCR_Stats
+# PCR_Stats_WithoutLabels$Group <- NULL
+# 
+# PCR_Stats_Dist <- dist(as.matrix(PCR_Stats_WithoutLabels))
+# 
+# MDS_PCR_Stats_WithoutLabels <- cmdscale(PCR_Stats_Dist)
+# 
+# x <- MDS_PCR_Stats_WithoutLabels[,1]
+# y <- MDS_PCR_Stats_WithoutLabels[,2]
+# 
+# png(filename = "./Figs/MDS_Plots/MDS_PCR.png", width = 2500, height = 2000, res = 300)
+# plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
+#      main="PCR MDS", col = as.numeric(pcrGroup), pch = 16)
+# #abline(0,1)
+# text(x, y, labels = ktspStatsPCR$statistics, cex=1 ,pos = 1, col = as.numeric(pcrGroup),)
+# dev.off()
 
 #################################################################################################
 
@@ -366,97 +367,97 @@ dev.off()
 ## Make paired boxplot for the array data
 
 ## Which TSPs
-i <- 1:nrow(ArrayKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=ArrayKTSP$TSPs)
-
-## Assemble
-dfTspArray <- lapply(tsp, function(i, x, g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
-}, x=ArrayMat, g=ArrayGroup)
-
-## Reduce
-datArray <- Reduce("rbind", dfTspArray)
-
-## Rename columns
-colnames(datArray)[colnames(datArray) %in% c("variable", "value")] <- c("Gene", "Expression")
-
-#####
-## Make paired boxplot
-png("./Figs/BoxPlots/KTSP_Array_Boxplot.png", width = 3000, height = 1500, res = 200)
-bxplt <- ggplot(na.omit(datArray), aes(x=Gene, y=Expression, fill=Group)) +
-  geom_boxplot(outlier.shape = NA) + 
-  geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
-  facet_wrap(~pair, scales = "free", nrow = 2) +
-  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
-bxplt
-dev.off()
-
-##################################################################################################
-## Make paired boxplot for the array data
-
-## Which TSPs
-i <- 1:nrow(tcgaKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=tcgaKTSP$TSPs)
-
-## Assemble
-dfTspTcga <- lapply(tsp, function(i, x, g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
-}, x=tcgaMat, g=tcgaGroup)
-
-## Reduce
-datTcga <- Reduce("rbind", dfTspTcga)
-
-## Rename columns
-colnames(datTcga)[colnames(datTcga) %in% c("variable", "value")] <- c("Gene", "Expression")
-
-#####
-## Make paired boxplot
-png("./Figs/BoxPlots/KTSP_TCGA_Boxplot.png", width = 3000, height = 1500, res = 200)
-bxplt <- ggplot(na.omit(datTcga), aes(x=Gene, y=Expression, fill=Group)) +
-  geom_boxplot(outlier.shape = NA) + 
-  geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
-  facet_wrap(~pair, scales = "free", nrow = 2) +
-  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
-bxplt
-dev.off()
+# i <- 1:nrow(ArrayKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=ArrayKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspArray <- lapply(tsp, function(i, x, g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
+# }, x=ArrayMat, g=ArrayGroup)
+# 
+# ## Reduce
+# datArray <- Reduce("rbind", dfTspArray)
+# 
+# ## Rename columns
+# colnames(datArray)[colnames(datArray) %in% c("variable", "value")] <- c("Gene", "Expression")
+# 
+# #####
+# ## Make paired boxplot
+# png("./Figs/BoxPlots/KTSP_Array_Boxplot.png", width = 3000, height = 1500, res = 200)
+# bxplt <- ggplot(na.omit(datArray), aes(x=Gene, y=Expression, fill=Group)) +
+#   geom_boxplot(outlier.shape = NA) + 
+#   geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
+#   facet_wrap(~pair, scales = "free", nrow = 2) +
+#   theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
+# bxplt
+# dev.off()
+# 
+# ##################################################################################################
+# ## Make paired boxplot for the array data
+# 
+# ## Which TSPs
+# i <- 1:nrow(tcgaKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=tcgaKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspTcga <- lapply(tsp, function(i, x, g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
+# }, x=tcgaMat, g=tcgaGroup)
+# 
+# ## Reduce
+# datTcga <- Reduce("rbind", dfTspTcga)
+# 
+# ## Rename columns
+# colnames(datTcga)[colnames(datTcga) %in% c("variable", "value")] <- c("Gene", "Expression")
+# 
+# #####
+# ## Make paired boxplot
+# png("./Figs/BoxPlots/KTSP_TCGA_Boxplot.png", width = 3000, height = 1500, res = 200)
+# bxplt <- ggplot(na.omit(datTcga), aes(x=Gene, y=Expression, fill=Group)) +
+#   geom_boxplot(outlier.shape = NA) + 
+#   geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
+#   facet_wrap(~pair, scales = "free", nrow = 2) +
+#   theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
+# bxplt
+# dev.off()
 
 #################################################################################
 ## Make paired boxplot for the PCR data
 
 ## Which TSPs
-i <- 1:nrow(ArrayKTSP$TSPs)
-
-## Assemble in a data frame
-tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=ArrayKTSP$TSPs)
-
-## Assemble
-dfTspPCR <- lapply(tsp, function(i, x, g){
-  out <- data.frame(t(x[i, ]), Group=g)
-  out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
-}, x=pcrMat, g=pcrGroup)
-
-## Reduce
-datPCR <- Reduce("rbind", dfTspPCR)
-
-## Rename columns
-colnames(datPCR)[colnames(datPCR) %in% c("variable", "value")] <- c("Gene", "Expression")
-
-#####
-## Make paired boxplot
-png("./Figs/BoxPlots/KTSP_PCR_Boxplot.png", width = 3000, height = 1500, res = 200)
-bxplt <- ggplot(na.omit(datPCR), aes(x=Gene, y=Expression, fill=Group)) +
-  geom_boxplot(outlier.shape = NA) + 
-  geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
-  facet_wrap(~pair, scales = "free", nrow = 2) +
-  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
-bxplt
-dev.off()
+# i <- 1:nrow(ArrayKTSP$TSPs)
+# 
+# ## Assemble in a data frame
+# tsp <- lapply(i, function(i, x) as.character(unlist(x[i,1:2])), x=ArrayKTSP$TSPs)
+# 
+# ## Assemble
+# dfTspPCR <- lapply(tsp, function(i, x, g){
+#   out <- data.frame(t(x[i, ]), Group=g)
+#   out <- cbind(pair=paste("TSP:", paste(i, collapse = "-")), melt(out))
+# }, x=pcrMat, g=pcrGroup)
+# 
+# ## Reduce
+# datPCR <- Reduce("rbind", dfTspPCR)
+# 
+# ## Rename columns
+# colnames(datPCR)[colnames(datPCR) %in% c("variable", "value")] <- c("Gene", "Expression")
+# 
+# #####
+# ## Make paired boxplot
+# png("./Figs/BoxPlots/KTSP_PCR_Boxplot.png", width = 3000, height = 1500, res = 200)
+# bxplt <- ggplot(na.omit(datPCR), aes(x=Gene, y=Expression, fill=Group)) +
+#   geom_boxplot(outlier.shape = NA) + 
+#   geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) + 
+#   facet_wrap(~pair, scales = "free", nrow = 2) +
+#   theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size= 17.5), strip.text.x = element_text(face = "bold", size = 11))
+# bxplt
+# dev.off()
 
 
 ################################################################################################
@@ -482,20 +483,24 @@ ktspStatsPCR <- SWAP.KTSP.Statistics(
   CombineFunc = sum)
 
 ### Prepare the legend
-forLegend_KTSP <- apply(rbind(
+forLegend_Train <- apply(rbind(
   ci(roc(ArrayGroup, ktspStatsArray$statistics, levels = c("NEG", "POS"), direction = ">")),
-  ci(roc(tcgaGroup, ktspStatsTCGA$statistics, levels = c("NEG", "POS"), direction = ">")),
-  ci(roc(pcrGroup, ktspStatsPCR$statistics, levels = c("NEG", "POS"), direction = ">"))
+  ci(roc(tcgaGroup, ktspStatsTCGA$statistics, levels = c("NEG", "POS"), direction = ">"))
 ),  1, function(x) {
   x <- format(round(x, digits=2), nsmall=2)
   paste("AUC: ", x[[2]], ";", "95% CI: ", x[[1]], "-", x[[3]])
 })
 
-
+forLegend_Test <- apply(rbind(
+  ci(roc(pcrGroup, ktspStatsPCR$statistics, levels = c("NEG", "POS"), direction = ">"))
+),  1, function(x) {
+  x <- format(round(x, digits=2), nsmall=2)
+  paste("AUC: ", x[[2]], ";", "95% CI: ", x[[1]], "-", x[[3]])
+})
 #################################################################
 ### ROC curves Using ggplot2
 
-### Training
+### Training1
 datArray_KTSP <- melt(data.frame(
   ## Training Group
   ArrayGroup= factor(ArrayGroup, levels = c("NEG", "POS")),
@@ -505,7 +510,7 @@ datArray_KTSP <- melt(data.frame(
 colnames(datArray_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 
 
-### Testing
+### Training2
 datTcga_KTSP <- melt(data.frame(
   ## Testing group
   Testing= factor(tcgaGroup, levels = c("NEG", "POS")),
@@ -513,6 +518,11 @@ datTcga_KTSP <- melt(data.frame(
   ktspStatsTCGA=ktspStatsTCGA$statistics))
 ### Change Colnames
 colnames(datTcga_KTSP) <- c("Status", "Dataset", "KTSP_sum")
+
+### Combine
+dat_KTSP_Train <- rbind(datArray_KTSP, datTcga_KTSP)
+dat_KTSP_Train$Status <- as.numeric(dat_KTSP_Train$Status)-1
+
 
 ### Testing
 datPCR_KTSP <- melt(data.frame(
@@ -524,24 +534,26 @@ datPCR_KTSP <- melt(data.frame(
 colnames(datPCR_KTSP) <- c("Status", "Dataset", "KTSP_sum")
 
 ### Combine
-dat_KTSP <- rbind(datArray_KTSP, datTcga_KTSP, datPCR_KTSP)
-dat_KTSP$Status <- as.numeric(dat_KTSP$Status)-1
+datPCR_KTSP$Status <- as.numeric(datPCR_KTSP$Status)-1
 
 ### Replace levels
-levels(dat_KTSP$Dataset) <- c("Training (Array)", "Training (TCGA)", "Testing (RT-PCR)")
-levels(dat_KTSP$Dataset) <- paste(levels(dat_KTSP$Dataset), forLegend_KTSP)
+levels(dat_KTSP_Train$Dataset) <- c("Training (Array)", "Training (TCGA)")
+levels(dat_KTSP_Train$Dataset) <- paste(levels(dat_KTSP_Train$Dataset), forLegend_Train)
+
+levels(datPCR_KTSP$Dataset) <- c("Testing (RT-PCR)")
+levels(datPCR_KTSP$Dataset) <- paste(levels(datPCR_KTSP$Dataset), forLegend_Test)
 
 #################################################################
 ### Plot Curve
-png("./Figs/CompareAUCggplot.png",
+png("./Figs/CompareAUCggplot_Training.png",
     width=3000, height=3000, res=360)
 ### Color
 myCol <- brewer.pal(3, "Dark2")[c(2,1)]
 ### Plot and legend titles
-plotTitle <- "K-TSP Performance in the training and testing datasets"
+plotTitle <- "K-TSP Performance in the training datasets"
 #legendTitle <- "Dataset"
 ### Plot
-basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
+basicplot_KTSP <- ggplot(dat_KTSP_Train, aes(d=Status, m=KTSP_sum, color=Dataset,
                                        linetype = Dataset)) +
   geom_roc(increasing = F) +
   style_roc(theme = theme_grey) + ggtitle(plotTitle) +
@@ -552,7 +564,7 @@ basicplot_KTSP <- ggplot(dat_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
         legend.background=element_rect(fill="lightblue1"),
         legend.text=element_text(face="plain", size = 10),
         legend.title = element_text(face="bold", size=12)) +
-  scale_color_manual(values = c("darkred", "darkred", "darkblue")) +
+  scale_color_manual(values = c("darkred", "darkblue")) +
   #scale_color_manual(legendTitle, values=rep(myCol, 2)) +
   scale_linetype_manual(values=c("solid", "solid", "solid")) +
   guides(colour = guide_legend(override.aes = list(size=3)))
@@ -561,8 +573,42 @@ basicplot_KTSP
 ### Close device
 dev.off()
 
-pdf("./Figs/Heatmaps/Figure2.pdf", width = 10, height = 9, onefile = F)
+png("./Figs/CompareAUCggplot_Testing.png",
+    width=3000, height=3000, res=360)
+### Color
+myCol <- brewer.pal(3, "Dark2")[c(2,1)]
+### Plot and legend titles
+plotTitle <- "K-TSP Performance in the RT-PCR dataset"
+#legendTitle <- "Dataset"
+### Plot
+basicplot_PCR <- ggplot(datPCR_KTSP, aes(d=Status, m=KTSP_sum, color=Dataset,
+                                             linetype = Dataset)) +
+  geom_roc(increasing = F) +
+  style_roc(theme = theme_grey) + ggtitle(plotTitle) +
+  theme(plot.title = element_text(face="bold", size=16, hjust = 0.5),
+        axis.text=element_text(face="plain", size = 11),
+        axis.title=element_text(face="bold", size = 13),
+        legend.justification=c(1,0),  legend.position=c(1,0),
+        legend.background=element_rect(fill="lightblue1"),
+        legend.text=element_text(face="plain", size = 10),
+        legend.title = element_text(face="bold", size=12)) +
+  scale_color_manual(values = c("darkgreen")) +
+  #scale_color_manual(legendTitle, values=rep(myCol, 2)) +
+  scale_linetype_manual(values=c("solid", "solid", "solid")) +
+  guides(colour = guide_legend(override.aes = list(size=3)))
+### Plot
+basicplot_PCR
+### Close device
+dev.off()
+
+
+pdf("./Figs/Heatmaps/Figure1.pdf", width = 10, height = 9, onefile = F)
 basicplot_KTSP
+dev.off()
+
+
+pdf("./Figs/Heatmaps/Figure3.pdf", width = 10, height = 9, onefile = F)
+basicplot_PCR
 dev.off()
 
 save(basicplot_KTSP, file = "./Objs/BasicPlot_KTSP.rda")
