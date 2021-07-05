@@ -1,8 +1,6 @@
 #################################################################
 ### TCGA head and neck data for LN statu kTSP prediction and validation
 ### Luigi Marchionni
-### Collaboration with Yasmen Ghantous (Sidransky lab)
-### Unrestricted kTSP
 
 
 #################################################################
@@ -30,7 +28,7 @@ require(plotROC)
 load("./Objs/myTSPs.rda")
 
 ### Load data
-load("objs/lymphnodeDataSmallBatchCorr.rda")
+load("objs/Data_BatchCorr.rda")
 
 #################################################################
 ### Filter genes in pairs
@@ -44,6 +42,7 @@ str(keepGns)
 
 ### For the TSP
 myTSPs <- myTSPs[myTSPs[,1] %in% keepGns & myTSPs[,2] %in% keepGns , ]
+
 
 ### ### How many
 ### nrow(myTSPs)
@@ -106,9 +105,6 @@ tcgaMat <- tcgaMat[ -grep("GAPDH",  rownames(tcgaMat)), ]
 featN <-  nrow(ArrayMat)
 featN
 
-### ### Possible number of TPS
-### choose(featN,  2)
-
 ### Set k
 k <- nrow(myTSPs)
 
@@ -169,7 +165,6 @@ tcgaKTSP$score <- tcgaKTSP$score[keepTest]
 tcgaKTSP$TSPs <- tcgaKTSP$TSPs[keepTest, ]
 tcgaKTSP$tieVote <- droplevels(tcgaKTSP$tieVote[keepTest])
 
-
 #################################################################
 #################################################################
 ### Any TSPs in common?
@@ -191,17 +186,6 @@ medTSPscore <- medTSPscore[order(medTSPscore, decreasing = T)]
 
 # Take the top 6
 tspNms <- names(medTSPscore)[1:6]
-
-### Set TSP score threshold
-#tspTHR <- quantile(medTSPscore, 0.91)
-#tspTHR
-
-### Plot
-#plot(ArrayKTSP$score[tspNms], tcgaKTSP$score[tspNms],  pch=16,
-#     col=2+(medTSPscore > tspTHR))
-
-### Which ones?
-#tspNms <- names(medTSPscore)[medTSPscore > tspTHR]
 
 ### Show filtered
 tspNms

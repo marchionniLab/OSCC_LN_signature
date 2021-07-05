@@ -1,7 +1,7 @@
 ################################################################
-### Solit TCGA head and neck data for LN statu kTSP prediction and validation
-### Luigi Marchionni
-### Collaboration with Yasmen Ghantous (Sidransky lab)
+### Combine datasets together 
+### Filter to samples of interest: HPV-ve T1-T2 OSCC with LN status 
+### Correct for batch effect
 
 
 #################################################################
@@ -68,15 +68,15 @@ phenoTCGA$TumorNucleiPerc <- apply(phenoTCGA[, sel], 1, median, na.rm=TRUE)
 
 
 #################################################################
-### Load phenotypes from Farhoud
-load("objs/lymphnodeDataStudy.rda")
+### Load phenotypes information for the TCGA dataset from Farhoud
+load("objs/tcga_Farhood.rda")
 
 ### Rename   (testPhenoStudy is the tcga pheno from Farhoud)
-targets <- testPhenoStudy
+targets <- tcgaPhenoStudy
+targets$patientID <- targets$pt_id
 
 ### Clean
 rm(list=c("sel", ls(pattern="train"), ls(pattern="test")))
-
 
 #################################################################
 ### Compare targets and UCSC Xena phenotypes
@@ -102,8 +102,10 @@ rownames(pheno) <- gsub("-",  ".",  pheno$sampleID)
 
 ### Check
 dim(pheno)
-sum(duplicated(pheno$PatientIDIdentifier))
+sum(duplicated(pheno$patientID))
 
+# Remove duplicated samples
+pheno <- pheno[!duplicated(pheno$patientID), ]
 
 #################################################################
 ### Drop zeros
@@ -116,20 +118,20 @@ mrnaTCGA <- normalizeBetweenArrays(1+mrnaTCGA)
 
 #################################################################
 ### Subset gene expression
-testMat <- mrnaTCGA[,  rownames(pheno)]
-testPheno <- droplevels(pheno)
-testGrp <- testPheno$NodeStatus
-testGrp <- relevel(testGrp, "POS")
+tcgaMat <- mrnaTCGA[,  rownames(pheno)]
+tcgaPheno <- droplevels(pheno)
+tcgaGrp <- tcgaPheno$NodeStatus
+tcgaGrp <- relevel(tcgaGrp, "POS")
 
 ### Check
-all(colnames(testMat) == rownames(testPheno))
+all(colnames(tcgaMat) == rownames(tcgaPheno))
 
 
 ########################################################
 #################################################################
 #################################################################
-### Load expression data and phenotypes
-load("./Objs/combinedDataSmall.rda")
+### Load expression data and phenotypes from the two microarray datasets
+load("./Objs/ArrayData.rda")
 
 
 #################################################################
@@ -166,39 +168,39 @@ pheno <- pheno[ smps, ]
 
 #################################################################
 ### Subset gene expression
-trainMat <- dat[,  rownames(pheno)]
-trainPheno <- droplevels(pheno)
-trainGrp <- trainPheno$NodeStatus
-trainGrp <- relevel(trainGrp, "POS")
+arrayMat <- dat[,  rownames(pheno)]
+arrayPheno <- droplevels(pheno)
+arrayGrp <- arrayPheno$NodeStatus
+arrayGrp <- relevel(arrayGrp, "POS")
 
 ### Check
-all(colnames(testMat) == rownames(testPheno))
-all(colnames(trainMat) == rownames(trainPheno))
-all(colnames(trainMat) == pheno$sampleID)
+all(colnames(tcgaMat) == rownames(tcgaPheno))
+all(colnames(arrayMat) == rownames(arrayPheno))
+all(colnames(arrayMat) == pheno$sampleID)
 
 
 #################################################################
 ### Common Genes
-gns <- intersect(rownames(trainMat), rownames(testMat))
+gns <- intersect(rownames(arrayMat), rownames(tcgaMat))
 str(gns)
 
 ### Subset
-trainMat <- trainMat[gns, ]
-testMat <- testMat[gns, ]
+arrayMat <- arrayMat[gns, ]
+tcgaMat <- tcgaMat[gns, ]
 
 
 #################################################################
 ### Combine and combat and psva correct
 
 ### Matrix
-mat <- cbind(trainMat, testMat)
+mat <- cbind(arrayMat, tcgaMat)
 
 ### Factor
-grp <- factor(c(trainGrp, testGrp))
+grp <- factor(c(arrayGrp, tcgaGrp))
 levels(grp) <- c("POS", "NEG")
 
 ### Source
-dataset <- c(pheno$dataset,  rep("TCGA", ncol(testMat)))
+dataset <- c(pheno$dataset,  rep("TCGA", ncol(tcgaMat)))
 
 
 #################################################################
@@ -220,14 +222,13 @@ combat.mat <- ComBat(mat, batch=dataset)
 
 #################################################################
 ### Save
-save(mat, combat.mat, psva.mat, grp, dataset,  file="objs/lymphnodeDataSmallBatchCorr.rda")
+save(mat, combat.mat, psva.mat, grp, dataset,  file="objs/Data_BatchCorr.rda")
 
 ## Save the pheno also for later use
-save(trainPheno, testPheno, file = "./Objs/Pheno.rda")
+save(arrayPheno, tcgaPheno, file = "./Objs/Pheno.rda")
 #################################################################
 ### Session Info
 sessionInfo()
 
-q("no")
 
 
