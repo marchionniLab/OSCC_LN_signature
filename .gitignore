@@ -9,3 +9,6 @@ Text/
 .Rproj.user
 Bibliography/
 Code/NotUsed/
+*.DS_Store
+*.Rhistory
+
