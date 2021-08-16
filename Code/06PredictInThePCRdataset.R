@@ -3,12 +3,16 @@ rm(list = ls())
 
 library(switchBox)
 library(caret)
+library(dcurves)
+library(readxl)
 
 ###########################################################################################
 load("./Objs/FinalClassifiers.rda")
 
 ## Load the RT-PCR data
 pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
+
+pcrData2 <- read_excel("data/RT_PCR/Table1.xlsx")
 
 # Get the node status
 pcrGroup <- pcrData$NodeStatus
@@ -58,4 +62,22 @@ PCRperf_Xtabs <- as.matrix(PCRperf, what = "xtabs")
 write.csv(PCRperf_Xtabs, file = "./objs/Performance_All/PCR_Xtabs.csv")
 
 write.csv(PCRperf_Classes, file = "./objs/Performance_All/PCR_Performance.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
