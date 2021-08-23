@@ -7,7 +7,7 @@ library(switchBox)
 library(caret)
 library(dcurves)
 library(readxl)
-
+library(epiR)
 
 ####################################
 ## Load the classifiers
@@ -59,6 +59,11 @@ pcrPrediction <- SWAP.KTSP.Classify(
 pcrGroup <- factor(pcrGroup, levels = c("POS", "NEG"))
 table(pcrGroup)
 
+confusionMatrix(pcrPrediction, pcrGroup, positive="POS")
+data <- as.table(matrix(c(19,3,0,13), nrow = 2, byrow = TRUE))
+rval <- epi.tests(data, conf.level = 0.95)
+print(rval)
+
 ######
 dat_PCR = data.frame('LN_status' = pcrGroup, 'signature' = pcrPrediction)
 
@@ -107,7 +112,11 @@ ArrayPrediction <- SWAP.KTSP.Classify(
 
 ### Print ROC curve local maximas
 auc(roc(ArrayGroup, ktspStatsArray$statistics))
+confusionMatrix(ArrayPrediction, ArrayGroup, positive="POS")
 
+data <- as.table(matrix(c(23,5,9,43), nrow = 2, byrow = TRUE))
+rval <- epi.tests(data, conf.level = 0.95)
+print(rval)
 
 dat_Array = data.frame('LN_status' = ArrayGroup, 'signature' = ArrayPrediction)
 
@@ -140,7 +149,7 @@ dev.off()
 
 
 ############################################################################
-## Array
+## TCGA
 
 # Get the prediction stats
 ktspStatsTCGA <- SWAP.KTSP.Statistics(
@@ -158,6 +167,10 @@ TCGAPrediction <- SWAP.KTSP.Classify(
 ### Print ROC curve local maximas
 auc(roc(tcgaGroup, ktspStatsTCGA$statistics))
 
+confusionMatrix(TCGAPrediction, tcgaGroup, positive="POS")
+data <- as.table(matrix(c(21,19,6,63), nrow = 2, byrow = TRUE))
+rval <- epi.tests(data, conf.level = 0.95)
+print(rval)
 
 dat_TCGA = data.frame('LN_status' = tcgaGroup, 'signature' = TCGAPrediction)
 
