@@ -77,7 +77,7 @@ dat_PCR$signature[dat_PCR$signature == '2'] <- 0
 pdf("./Figs/DCA/DCA_PCR.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_PCR,
-    thresholds = seq(0, 0.50, by = 0.01), prevalence = 0.30
+    thresholds = seq(0, 0.30, by = 0.01)
 ) %>%
   plot(smooth = TRUE)
 dev.off()
@@ -86,7 +86,7 @@ dev.off()
 pdf("./Figs/DCA/NetInt_PCR.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_PCR,
-    thresholds = seq(0, 0.5, by = 0.01), as_probability = "signature"
+    thresholds = seq(0, 0.30, by = 0.01), as_probability = "signature"
 ) %>%
   net_intervention_avoided(nper = 100) %>%
   #standardized_net_benefit() %>%
@@ -130,7 +130,7 @@ dat_Array$signature[dat_Array$signature == '2'] <- 0
 pdf("./Figs/DCA/DCA_Array.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_Array,
-    thresholds = seq(0, 0.50, by = 0.01)
+    thresholds = seq(0, 0.30, by = 0.01)
 ) %>%
   plot(smooth = TRUE)
 dev.off()
@@ -139,7 +139,7 @@ dev.off()
 pdf("./Figs/DCA/NetInt_Array.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_Array,
-    thresholds = seq(0, 0.5, by = 0.01), as_probability = "signature"
+    thresholds = seq(0, 0.3, by = 0.01), as_probability = "signature"
 ) %>%
   net_intervention_avoided(nper = 100) %>%
   #standardized_net_benefit() %>%
@@ -183,7 +183,7 @@ dat_TCGA$signature[dat_TCGA$signature == '2'] <- 0
 pdf("./Figs/DCA/DCA_TCGA.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_TCGA,
-    thresholds = seq(0, 0.50, by = 0.01)
+    thresholds = seq(0, 0.30, by = 0.01)
 ) %>%
   plot(smooth = TRUE)
 dev.off()
@@ -192,7 +192,7 @@ dev.off()
 pdf("./Figs/DCA/NetInt_TCGA.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_TCGA,
-    thresholds = seq(0, 0.5, by = 0.01), as_probability = "signature"
+    thresholds = seq(0, 0.3, by = 0.01), as_probability = "signature"
 ) %>%
   net_intervention_avoided(nper = 100) %>%
   #standardized_net_benefit() %>%
