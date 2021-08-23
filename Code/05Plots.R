@@ -8,6 +8,8 @@ library(superheat)
 library(reshape2)
 library(pROC)
 library(plotROC)
+library(dplyr)
+library(ggforce)
 
 ## Load the 2 classifiers and data
 load("./Objs/FinalClassifiers.rda")
@@ -305,6 +307,136 @@ dev.off()
 
 save(basicplot_KTSP, file = "./Objs/BasicPlot_KTSP.rda")
 
+####################################################################################################
+##################
+### Boxplots
 
-####################################################################################################
-####################################################################################################
+## Array
+
+## Which TSPs
+i <- 1:nrow(ArrayKTSP$TSPs)
+
+## Assemble in a data frame
+tsp <- lapply(i , function(i, x) as.character(unlist(x[i, 1:2])), x=ArrayKTSP$TSPs)
+
+
+
+# Assemble
+dfTspArray <- lapply(tsp, function(i,x,g){
+  out <- data.frame(t(x[i, ]), Group=g)
+  out$diff = out[, 1] - out[, 2]
+  out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), melt(out))
+}, x=ArrayMat, g=ArrayGroup)
+
+## Reduce
+datArray <- Reduce("rbind", dfTspArray)
+
+datArray_diff <- datArray[datArray$variable == 'diff', ]
+
+## Rename columns
+colnames(datArray)[colnames(datArray) %in% c("variable", "value")] <- c("Gene", "Expression")
+colnames(datArray_diff)[colnames(datArray_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
+
+## Make paired boxplot
+png("./Figs/BoxPlots/ArrayBoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+bxplt <- ggplot(na.omit(datArray_diff), aes(x=Gene, y=Expression, fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
+  facet_wrap(~pair, scales = "free", nrow = 2) +
+  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
+bxplt
+dev.off()
+
+########################
+## TCGA
+
+## Assemble
+dfTspTCGA <- lapply(tsp, function(i,x,g){
+  out <- data.frame(t(x[i, ]), Group=g)
+  out$diff = out[, 1] - out[, 2]
+  out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), melt(out))
+}, x=tcgaMat, g=tcgaGroup)
+
+## Reduce
+datTCGA <- Reduce("rbind", dfTspTCGA)
+datTCGA_diff <- datTCGA[datTCGA$variable == 'diff', ]
+
+
+## Rename columns
+colnames(datTCGA)[colnames(datTCGA) %in% c("variable", "value")] <- c("Gene", "Expression")
+colnames(datTCGA_diff)[colnames(datTCGA_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
+
+## Make paired boxplot
+png("./Figs/BoxPlots/TCGABoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+bxplt <- ggplot(na.omit(datTCGA_diff), aes(x=Gene, y=Expression, fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
+  facet_wrap(~pair, scales = "free", nrow = 2) +
+  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
+bxplt
+dev.off()
+
+########################
+## PCR
+
+## Load the RT-PCR data
+pcrData <- read.delim("./Data/RT_PCR/deltaCt.txt")
+
+# Get the node status
+pcrGroup <- pcrData$NodeStatus
+table(pcrGroup)
+# Rename the groups from 0,1 to neg,pos
+pcrGroup[pcrGroup == 0] <- "NEG"
+pcrGroup[pcrGroup == 1] <- "POS"
+
+table(pcrGroup)
+pcrGroup = factor(pcrGroup, levels = c("POS", "NEG"))
+
+# Get the matrix
+pcrMat <- pcrData[, -14]
+rownames(pcrMat) <- pcrMat$SampleName
+pcrMat$SampleName <- NULL
+
+# Transpose the matrix
+pcrMat <- t(pcrMat)
+
+# One gene is misspelled, rename it
+rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
+
+pcrMat <- log2(pcrMat+1)
+#pcrMat <- t(scale(t(pcrMat), scale = T, center = T))
+
+## Assemble
+dfTspPCR <- lapply(tsp, function(i,x,g){
+  out <- data.frame(t(x[i, ]), Group=g)
+  out$diff = out[, 1] - out[, 2]
+  out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), melt(out))
+}, x=pcrMat, g=pcrGroup)
+
+## Reduce
+datPCR <- Reduce("rbind", dfTspPCR)
+datPCR_diff <- datPCR[datPCR$variable == 'diff', ]
+
+## Rename columns
+colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
+colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
+
+
+## Make paired boxplot
+png("./Figs/BoxPlots/PCRBoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+bxplt <- ggplot(na.omit(datPCR_diff), aes(x=Gene, y=Expression, fill=Group)) +
+  geom_boxplot(outlier.shape = NA) +
+  #boxplot_framework(upper_limit = 1,
+  #                  lower_limit = -1, fill_var = 'Group', logY = T) +
+  #geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
+  facet_wrap(~pair, scales = "free_y", nrow = 2) +
+  #scale_y_log10() +
+  coord_cartesian(ylim = c(-0.5, 0.5))
+  #scale_y_continuous(limits = function(x){c(0.1, max(0.1, x))}) +
+  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
+bxplt
+dev.off()
+
+
+
+

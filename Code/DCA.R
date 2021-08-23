@@ -72,7 +72,7 @@ dat_PCR$signature[dat_PCR$signature == '2'] <- 0
 pdf("./Figs/DCA/DCA_PCR.pdf", width = 10, height = 8, onefile = F)
 dca(LN_status ~ signature, 
     data = dat_PCR,
-    thresholds = seq(0, 0.50, by = 0.01)
+    thresholds = seq(0, 0.50, by = 0.01), prevalence = 0.30
 ) %>%
   plot(smooth = TRUE)
 dev.off()
