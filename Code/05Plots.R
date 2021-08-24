@@ -338,7 +338,7 @@ colnames(datArray)[colnames(datArray) %in% c("variable", "value")] <- c("Gene", 
 colnames(datArray_diff)[colnames(datArray_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
 
 ## Make paired boxplot
-png("./Figs/BoxPlots/ArrayBoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+pdf("./Figs/BoxPlots/ArrayBoxPlot_diff.pdf", width = 10, height = 9, onefile = F)
 bxplt <- ggplot(na.omit(datArray_diff), aes(x=Gene, y=Expression, fill=Group)) +
   geom_boxplot(outlier.shape = NA) +
   geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
@@ -367,7 +367,7 @@ colnames(datTCGA)[colnames(datTCGA) %in% c("variable", "value")] <- c("Gene", "E
 colnames(datTCGA_diff)[colnames(datTCGA_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
 
 ## Make paired boxplot
-png("./Figs/BoxPlots/TCGABoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+pdf("./Figs/BoxPlots/TCGABoxPlot_diff.pdf", width = 10, height = 9, onefile = F)
 bxplt <- ggplot(na.omit(datTCGA_diff), aes(x=Gene, y=Expression, fill=Group)) +
   geom_boxplot(outlier.shape = NA) +
   geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
@@ -423,7 +423,7 @@ colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("G
 
 
 ## Make paired boxplot
-png("./Figs/BoxPlots/PCRBoxPlot_diff.png", width = 3000, height = 1500, res = 200)
+pdf("./Figs/BoxPlots/PCRBoxPlot_diff.pdf", width = 10, height = 9, onefile = F)
 bxplt <- ggplot(na.omit(datPCR_diff), aes(x=Gene, y=Expression, fill=Group)) +
   geom_boxplot(outlier.shape = NA) +
   #boxplot_framework(upper_limit = 1,
