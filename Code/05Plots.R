@@ -426,17 +426,15 @@ colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("G
 pdf("./Figs/BoxPlots/PCRBoxPlot_diff.pdf", width = 10, height = 9, onefile = F)
 bxplt <- ggplot(na.omit(datPCR_diff), aes(x=Gene, y=Expression, fill=Group)) +
   geom_boxplot(outlier.shape = NA) +
-  #boxplot_framework(upper_limit = 1,
-  #                  lower_limit = -1, fill_var = 'Group', logY = T) +
   #geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
-  facet_wrap(~pair, scales = "free_y", nrow = 2) +
+  facet_wrap(~pair, scales = "free", nrow = 2) +
   #scale_y_log10() +
-  coord_cartesian(ylim = c(-0.5, 0.5))
+  coord_cartesian(ylim = c(-1, 1)) +
   #scale_y_continuous(limits = function(x){c(0.1, max(0.1, x))}) +
-  theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
+  #geom_blank(data = blank_data, aes(x = x, y = y)) + facet_wrap(~pair, scales = "free_y") +
+  expand_limits(y = 0) + scale_y_continuous(expand = c(0, 0))
+  #theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
 bxplt
 dev.off()
-
-
 
 
