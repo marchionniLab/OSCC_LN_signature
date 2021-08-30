@@ -10,6 +10,7 @@ library(pROC)
 library(plotROC)
 library(dplyr)
 library(ggforce)
+library(ggridges)
 
 ## Load the 2 classifiers and data
 load("./Objs/FinalClassifiers.rda")
@@ -403,22 +404,30 @@ pcrMat <- t(pcrMat)
 # One gene is misspelled, rename it
 rownames(pcrMat)[rownames(pcrMat) == "TFGB2"] <- "TGFB2"
 
-pcrMat <- log2(pcrMat+1)
+#pcrMat <- log2(pcrMat+2)
 #pcrMat <- t(scale(t(pcrMat), scale = T, center = T))
+
+pcrMat2 <- normalizeBetweenArrays(pcrMat, method = 'quantile')
+pcrMat2 <- log2(pcrMat2+0.1)
+#pcrMat2 <- log2(pcrMat2+1)
+
+
+boxplot(pcrMat2)
+range(pcrMat2)
 
 ## Assemble
 dfTspPCR <- lapply(tsp, function(i,x,g){
   out <- data.frame(t(x[i, ]), Group=g)
   out$diff = out[, 1] - out[, 2]
   out <- cbind(pair= paste("TSP:", paste(i, collapse = "-")), melt(out))
-}, x=pcrMat, g=pcrGroup)
+}, x=pcrMat2, g=pcrGroup)
 
 ## Reduce
 datPCR <- Reduce("rbind", dfTspPCR)
 datPCR_diff <- datPCR[datPCR$variable == 'diff', ]
 
 ## Rename columns
-colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
+colnames(datPCR)[colnames(datPCR) %in% c("variable", "value")] <- c("Gene", "Expression")
 colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("Gene", "Expression")
 
 
@@ -426,15 +435,20 @@ colnames(datPCR_diff)[colnames(datPCR_diff) %in% c("variable", "value")] <- c("G
 pdf("./Figs/BoxPlots/PCRBoxPlot_diff.pdf", width = 10, height = 9, onefile = F)
 bxplt <- ggplot(na.omit(datPCR_diff), aes(x=Gene, y=Expression, fill=Group)) +
   geom_boxplot(outlier.shape = NA) +
-  #geom_point(aes(group=Group), position = position_jitterdodge(), size=0.75, color=rgb(0.2,0.2,0.2,0.5)) +
-  facet_wrap(~pair, scales = "free", nrow = 2) +
+  geom_point(aes(group=Group), position = position_jitterdodge(), size=1, color=rgb(0.2,0.2,0.2,0.5)) +
+  facet_wrap(~pair, scales = "free", nrow = 2)
   #scale_y_log10() +
-  coord_cartesian(ylim = c(-1, 1)) +
+  #coord_cartesian(ylim = c(-1.5, 1.5))
   #scale_y_continuous(limits = function(x){c(0.1, max(0.1, x))}) +
-  #geom_blank(data = blank_data, aes(x = x, y = y)) + facet_wrap(~pair, scales = "free_y") +
-  expand_limits(y = 0) + scale_y_continuous(expand = c(0, 0))
+  #coord_cartesian(ylim = quantile(datPCR_diff$Expression, c(0.1, 0.9)))+
+  #scale_y_continuous(expand = c(0.5,0.5)) 
   #theme(axis.text = element_text(face = "bold", size = 12), axis.title = element_text(face = "bold", size = 12), legend.position = "bottom", legend.text = element_text(face = "bold", size = 17.5), legend.title = element_text(face = "bold", size = 17.5), strip.text.x = element_text(face = "bold", size = 11))
 bxplt
 dev.off()
+
+
+##################
+
+
 
 
